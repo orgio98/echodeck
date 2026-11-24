@@ -467,8 +467,10 @@
       <div class="card">
         <div class="card-title">
           <span>상황별 핵심 문장 쉐도잉</span>
-          <span style="font-size:0.78rem; color:var(--muted); font-weight:500;">상황 선택 후 듣기·반복·단어 클릭 저장</span>
+          <button id="resetAllPresetBtn" class="sm">🔄 기본 상황 데이터 초기화</button>
         </div>
+
+        <div class="chip-row" id="shadowingCategoryChips"></div>
 
         <div class="controls-bar">
           <select id="scriptSelect"></select>
@@ -533,13 +535,7 @@
           <div class="form-grid">
             <input type="text" id="qwExpr" placeholder="단어 또는 숙어" />
             <input type="text" id="qwMeaning" placeholder="한국어 뜻 입력" />
-            <select id="qwCategory">
-              <option value="비즈니스·회의">💼 비즈니스·회의</option>
-              <option value="일상·스몰토크">☕ 일상·스몰토크</option>
-              <option value="여행·식당·쇼핑">✈️ 여행·식당·쇼핑</option>
-              <option value="이메일·전화 응대">📧 이메일·전화 응대</option>
-              <option value="의견 제시·토론">💬 의견 제시·토론</option>
-            </select>
+            <select id="qwCategory"></select>
             <input type="text" id="qwIpa" placeholder="발음기호 (자동 채움)" />
             <input type="text" id="qwExample" placeholder="예문" style="grid-column: 1 / -1;" />
           </div>
@@ -578,13 +574,7 @@
         <div class="form-grid">
           <input type="text" id="addExpr" placeholder="영어 표현 (예: on the same page)" />
           <input type="text" id="addMeaning" placeholder="한국어 뜻 (예: 같은 생각인, 의견이 일치하는)" />
-          <select id="addCategory">
-            <option value="비즈니스·회의">💼 비즈니스·회의</option>
-            <option value="일상·스몰토크">☕ 일상·스몰토크</option>
-            <option value="여행·식당·쇼핑">✈️ 여행·식당·쇼핑</option>
-            <option value="이메일·전화 응대">📧 이메일·전화 응대</option>
-            <option value="의견 제시·토론">💬 의견 제시·토론</option>
-          </select>
+          <select id="addCategory"></select>
           <input type="text" id="addIpa" placeholder="발음기호 (선택)" />
           <input type="text" id="addExample" placeholder="예문 입력" style="grid-column: 1 / -1;" />
         </div>
@@ -597,7 +587,6 @@
         <div class="card-title">
           <span>상황별 단어·표현장</span>
           <div style="display:flex; flex-wrap:wrap; gap:6px;">
-            <button id="syncPresetBtn" class="sm accent">기본 상황별 세트 불러오기</button>
             <button id="exportJsonBtn" class="sm">JSON 백업</button>
             <label class="sm" style="border:1px solid var(--border); padding:5px 10px; border-radius:9px; font-size:0.78rem; font-weight:600; cursor:pointer; background:#fff;">
               JSON 복원
@@ -617,22 +606,27 @@
   <!-- YouTube IFrame Player API -->
   <script src="https://www.youtube.com/iframe_api"></script>
   <script>
-    const STORAGE_KEY = "echodeck_cards_v3";
-    const SCRIPTS_KEY = "echodeck_scripts_v3";
+    const STORAGE_KEY = "echodeck_cards_v4";
+    const SCRIPTS_KEY = "echodeck_scripts_v4";
 
-    const CATEGORIES = [
-      "전체",
-      "비즈니스·회의",
-      "일상·스몰토크",
-      "여행·식당·쇼핑",
-      "이메일·전화 응대",
-      "의견 제시·토론"
+    const CATEGORY_META = [
+      { key: "all", label: "전체" },
+      { key: "business", label: "💼 비즈니스·회의" },
+      { key: "daily", label: "☕ 일상·스몰토크" },
+      { key: "travel", label: "✈️ 여행·식당·쇼핑" },
+      { key: "email", label: "📧 이메일·전화 응대" },
+      { key: "opinion", label: "💬 의견 제시·토론" }
     ];
+
+    function getCategoryLabel(key) {
+      const found = CATEGORY_META.find(c => c.key === key);
+      return found ? found.label : "💼 비즈니스·회의";
+    }
 
     const DEFAULT_SCRIPTS = [
       {
         id: "cat_business",
-        category: "비즈니스·회의",
+        categoryKey: "business",
         title: "💼 비즈니스·회의 핵심 표현 (4문장)",
         youtubeId: "",
         sentences: [
@@ -664,7 +658,7 @@
       },
       {
         id: "cat_daily",
-        category: "일상·스몰토크",
+        categoryKey: "daily",
         title: "☕ 일상·스몰토크 필수 회화 (4문장)",
         youtubeId: "",
         sentences: [
@@ -696,12 +690,12 @@
       },
       {
         id: "cat_travel",
-        category: "여행·식당·쇼핑",
+        categoryKey: "travel",
         title: "✈️ 여행·식당·쇼핑 실전 표현 (4문장)",
         youtubeId: "",
         sentences: [
           {
-            keyExpr: "check in",
+            keyExpr: "under [Name]",
             en: "Hi, I have a reservation under Kim and would like to check in.",
             ko: "안녕하세요, 김(Kim) 이름으로 예약했는데 체크인하고 싶습니다.",
             start: null, end: null
@@ -709,158 +703,4 @@
           {
             keyExpr: "grab a bite",
             en: "Do you know any good places around here to grab a quick bite?",
-            ko: "이 근처에 간단히 요기할 만한 괜찮은 곳 아시나요?",
-            start: null, end: null
-          },
-          {
-            keyExpr: "try on",
-            en: "Excuse me, could I try this jacket on in a medium size?",
-            ko: "실례합니다, 이 재킷 미디엄 사이즈로 입어봐도 될까요?",
-            start: null, end: null
-          },
-          {
-            keyExpr: "split the bill",
-            en: "Could we split the bill, or is it easier to pay all together?",
-            ko: "계산을 따로 나눠서 할 수 있을까요, 아니면 한 번에 결제하는 게 편할까요?",
-            start: null, end: null
-          }
-        ]
-      },
-      {
-        id: "cat_email",
-        category: "이메일·전화 응대",
-        title: "📧 이메일·전화 응대 정중 표현 (4문장)",
-        youtubeId: "",
-        sentences: [
-          {
-            keyExpr: "get back to",
-            en: "Thank you for reaching out. I will get back to you by tomorrow afternoon.",
-            ko: "연락해 주셔서 감사합니다. 내일 오후까지 다시 회신드리겠습니다.",
-            start: null, end: null
-          },
-          {
-            keyExpr: "put someone through",
-            en: "Please hold on a moment while I put you through to the manager.",
-            ko: "담당 매니저분께 연결해 드릴 테니 잠시만 기다려 주세요.",
-            start: null, end: null
-          },
-          {
-            keyExpr: "touch base",
-            en: "I'm just writing to touch base regarding our upcoming project deadline.",
-            ko: "다가오는 프로젝트 마감일과 관련해 진행 상황을 확인차 연락드립니다.",
-            start: null, end: null
-          },
-          {
-            keyExpr: "look into",
-            en: "We are currently looking into the issue and will keep you posted.",
-            ko: "현재 해당 문제를 확인 중이며 진행 상황을 계속 공유해 드리겠습니다.",
-            start: null, end: null
-          }
-        ]
-      },
-      {
-        id: "cat_opinion",
-        category: "의견 제시·토론",
-        title: "💬 의견 제시·토론 논리 표현 (4문장)",
-        youtubeId: "",
-        sentences: [
-          {
-            keyExpr: "from my perspective",
-            en: "From my perspective, focusing on user experience should be our top priority.",
-            ko: "제 관점에서는 사용자 경험에 집중하는 것이 최우선 과제가 되어야 합니다.",
-            start: null, end: null
-          },
-          {
-            keyExpr: "have a point",
-            en: "You have a point there, though we also need to consider the budget.",
-            ko: "그 말씀도 일리가 있지만, 예산 부분도 함께 고려해야 합니다.",
-            start: null, end: null
-          },
-          {
-            keyExpr: "boil down to",
-            en: "Ultimately, the decision boils down to cost versus reliability.",
-            ko: "궁극적으로 이 결정은 비용 대 신뢰성의 문제로 귀결됩니다.",
-            start: null, end: null
-          },
-          {
-            keyExpr: "weigh the pros and cons",
-            en: "Let's carefully weigh the pros and cons before making a final call.",
-            ko: "최종 결정을 내리기 전에 장단점을 신중하게 따져봅시다.",
-            start: null, end: null
-          }
-        ]
-      }
-    ];
-
-    const DEFAULT_CARDS = [
-      // 비즈니스·회의
-      { id: "preset_b1", category: "비즈니스·회의", expression: "on the same page", meaning: "같은 생각인, 의견·이해가 일치하는", ipa: "/ɒn ðə seɪm peɪdʒ/", example: "Let's make sure we're all on the same page before moving forward." },
-      { id: "preset_b2", category: "비즈니스·회의", expression: "pull off", meaning: "(어려운 일을) 해내다, 성공시키다", ipa: "/pʊl ɒf/", example: "I didn't think she could pull off the presentation on such short notice." },
-      { id: "preset_b3", category: "비즈니스·회의", expression: "walk someone through", meaning: "~에게 단계별로 차근차근 설명하다", ipa: "/wɔːk θruː/", example: "Could you walk me through the updated schedule step by step?" },
-      { id: "preset_b4", category: "비즈니스·회의", expression: "circle back to", meaning: "(나중에) ~로 다시 돌아와 논의하다", ipa: "/ˈsɜːrkl bæk/", example: "Let's circle back to that issue once we gather more data." },
-      // 일상·스몰토크
-      { id: "preset_d1", category: "일상·스몰토크", expression: "take a rain check", meaning: "다음 기회로 미루다", ipa: "/teɪk ə reɪn tʃek/", example: "Something urgent came up at work, so I have to take a rain check." },
-      { id: "preset_d2", category: "일상·스몰토크", expression: "get the hang of", meaning: "~의 요령을 익히다, 익숙해지다", ipa: "/ɡet ðə hæŋ ɒv/", example: "It took me a while to get the hang of using the new system." },
-      { id: "preset_d3", category: "일상·스몰토크", expression: "beat yourself up", meaning: "자책하다, 스스로를 괴롭히다", ipa: "/biːt jɔːrˈself ʌp/", example: "Don't beat yourself up over a minor mistake." },
-      { id: "preset_d4", category: "일상·스몰토크", expression: "call it a day", meaning: "오늘 일과를 마치다, 이만 마무리하다", ipa: "/kɔːl ɪt ə deɪ/", example: "We've made great progress today, so let's call it a day." },
-      // 여행·식당·쇼핑
-      { id: "preset_t1", category: "여행·식당·쇼핑", expression: "under [Name]", meaning: "~의 이름으로 (예약된)", ipa: "/ˈʌndər/", example: "Hi, I have a reservation under Kim and would like to check in." },
-      { id: "preset_t2", category: "여행·식당·쇼핑", expression: "grab a bite", meaning: "간단히 식사하다, 요기하다", ipa: "/ɡræb ə baɪt/", example: "Do you know any good places around here to grab a quick bite?" },
-      { id: "preset_t3", category: "여행·식당·쇼핑", expression: "try on", meaning: "(옷·신발 등을) 입어보다, 신어보다", ipa: "/traɪ ɒn/", example: "Excuse me, could I try this jacket on in a medium size?" },
-      { id: "preset_t4", category: "여행·식당·쇼핑", expression: "split the bill", meaning: "계산을 나누다, 더치페이하다", ipa: "/splɪt ðə bɪl/", example: "Could we split the bill, or is it easier to pay all together?" },
-      // 이메일·전화 응대
-      { id: "preset_e1", category: "이메일·전화 응대", expression: "get back to", meaning: "~에게 다시 연락하다, 회신하다", ipa: "/ɡet bæk tuː/", example: "Thank you for reaching out. I will get back to you by tomorrow afternoon." },
-      { id: "preset_e2", category: "이메일·전화 응대", expression: "put someone through", meaning: "(전화를) ~에게 연결해 주다", ipa: "/pʊt θruː/", example: "Please hold on a moment while I put you through to the manager." },
-      { id: "preset_e3", category: "이메일·전화 응대", expression: "touch base", meaning: "연락을 취하다, 상황을 확인하다", ipa: "/tʌtʃ beɪs/", example: "I'm just writing to touch base regarding our upcoming project deadline." },
-      { id: "preset_e4", category: "이메일·전화 응대", expression: "keep someone posted", meaning: "~에게 계속 소식·진행 상황을 알리다", ipa: "/kiːp ˈpoʊstɪd/", example: "We are currently looking into the issue and will keep you posted." },
-      // 의견 제시·토론
-      { id: "preset_o1", category: "의견 제시·토론", expression: "from my perspective", meaning: "제 관점에서는, 제가 보기에는", ipa: "/frɒm maɪ pərˈspektɪv/", example: "From my perspective, focusing on user experience should be our top priority." },
-      { id: "preset_o2", category: "의견 제시·토론", expression: "have a point", meaning: "일리가 있다, 타당한 지적이다", ipa: "/hæv ə pɔɪnt/", example: "You have a point there, though we also need to consider the budget." },
-      { id: "preset_o3", category: "의견 제시·토론", expression: "boil down to", meaning: "결국 ~로 귀결되다, 요약되다", ipa: "/bɔɪl daʊn tuː/", example: "Ultimately, the decision boils down to cost versus reliability." },
-      { id: "preset_o4", category: "의견 제시·토론", expression: "weigh the pros and cons", meaning: "장단점을 따져보다", ipa: "/weɪ ðə proʊz ænd kɒnz/", example: "Let's carefully weigh the pros and cons before making a final call." }
-    ].map(item => ({
-      ...item,
-      interval: 0,
-      repetitions: 0,
-      easeFactor: 2.5,
-      dueDate: todayStr()
-    }));
-
-    function todayStr(offsetDays = 0) {
-      const d = new Date();
-      d.setDate(d.getDate() + offsetDays);
-      return d.toISOString().slice(0, 10);
-    }
-
-    function loadCards() {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) return JSON.parse(raw);
-
-      // Migrate from v2/v1 if present and merge presets
-      const prevRaw = localStorage.getItem("echodeck_cards_v2") || localStorage.getItem("echodeck_cards_v1");
-      if (prevRaw) {
-        const prev = JSON.parse(prevRaw).map(c => ({
-          category: "비즈니스·회의",
-          ipa: "",
-          ...c
-        }));
-        const existingExprs = new Set(prev.map(c => c.expression.toLowerCase()));
-        const merged = [...prev, ...DEFAULT_CARDS.filter(d => !existingExprs.has(d.expression.toLowerCase()))];
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
-        return merged;
-      }
-
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_CARDS));
-      return [...DEFAULT_CARDS];
-    }
-
-    function saveCards(list) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-      updateStats();
-    }
-
-    function loadScripts() {
-      const raw = localStorage.getItem(SCRIPTS_KEY);
-      if (!raw) {
-        localStorage.setItem(SCRIPTS_KEY, JSON.stringify(DEFAULT_SCRIPTS));
-        return JSON.parse(JSON.stringify(DEFAULT_SCRIPTS));
+            ko: "이 근처
