@@ -2,8 +2,8 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>EchoDeck Pro v5 — 상황별 영어 표현 & SRS 쉐도잉</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EchoDeck v6 — 원어민·미드 표현 280 쉐도잉 & SRS</title>
   <style>
     :root {
       --bg: #f4f6fb;
@@ -68,6 +68,7 @@
       padding: 6px 12px;
       border-radius: 999px;
       border: 1px solid var(--border);
+      white-space: nowrap;
     }
     .stats-pill strong { color: var(--primary); }
 
@@ -151,6 +152,10 @@
       border-radius: 9px;
       background: #fff;
       color: var(--text);
+      max-width: 100%;
+    }
+    @media (max-width: 640px) {
+      select, input[type="text"], input[type="number"] { font-size: 16px; }
     }
 
     .chip-row {
@@ -211,12 +216,24 @@
     .controls-bar {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 8px 12px;
       align-items: center;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
+    }
+    .controls-bar.last {
       padding-bottom: 12px;
       border-bottom: 1px solid var(--border);
+      margin-bottom: 14px;
     }
+    .controls-bar label {
+      font-size: 0.82rem;
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .controls-bar label select { padding: 5px 8px; }
+    #voiceSelect { max-width: 170px; }
 
     .sentence-item {
       border: 1px solid var(--border);
@@ -240,17 +257,24 @@
       margin-right: 6px;
       vertical-align: middle;
     }
+    .item-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
     .key-expr-tag {
       display: inline-block;
-      font-size: 0.74rem;
+      font-size: 0.76rem;
       background: #ecfdf5;
       color: #047857;
       border: 1px solid #a7f3d0;
       padding: 1px 8px;
       border-radius: 6px;
-      margin-bottom: 6px;
       font-weight: 600;
     }
+    .key-expr-tag em { font-style: normal; font-weight: 400; color: #065f46; }
     .en-line {
       font-size: 1.04rem;
       font-weight: 600;
@@ -259,6 +283,12 @@
     }
     .word-token {
       cursor: pointer;
+      border-radius: 4px;
+      padding: 1px 2px;
+    }
+    .word-token.key, mark.key {
+      background: #fef9c3;
+      color: inherit;
       border-radius: 4px;
       padding: 1px 2px;
     }
@@ -271,6 +301,11 @@
       color: var(--muted);
       margin-bottom: 10px;
     }
+    .blurred {
+      filter: blur(7px);
+      cursor: pointer;
+      user-select: none;
+    }
     .sentence-actions {
       display: flex;
       flex-wrap: wrap;
@@ -279,13 +314,15 @@
     }
     .stt-result {
       margin-top: 8px;
-      font-size: 0.82rem;
+      font-size: 0.85rem;
       padding: 8px 10px;
       border-radius: 8px;
       background: #f1f5f9;
       color: #334155;
       display: none;
     }
+    .stt-result .ok { color: var(--success); font-weight: 700; }
+    .stt-result .miss { color: var(--danger); font-weight: 700; text-decoration: underline; }
 
     .quick-box {
       background: #f8fafc;
@@ -317,6 +354,7 @@
       gap: 8px;
       margin-top: 8px;
     }
+    .form-grid .full { grid-column: 1 / -1; }
     @media (max-width: 640px) {
       .form-grid, .form-grid-4 { grid-template-columns: 1fr; }
     }
@@ -345,21 +383,25 @@
       background: #ecfdf5;
       padding: 2px 10px;
       border-radius: 999px;
-      margin-bottom: 8px;
-    }
-    .fc-word {
-      font-size: 1.6rem;
-      font-weight: 800;
-      margin-bottom: 4px;
-    }
-    .fc-ipa {
-      font-size: 0.85rem;
-      color: var(--muted);
       margin-bottom: 10px;
     }
+    .fc-new { background: #fef3c7; color: #b45309; margin-left: 6px; }
+    .fc-main {
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      max-width: 600px;
+    }
+    .fc-sub {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 14px;
+      max-width: 560px;
+    }
     .fc-example {
-      font-size: 0.96rem;
-      color: #334155;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #1e293b;
       max-width: 560px;
       margin-bottom: 14px;
     }
@@ -368,7 +410,7 @@
       gap: 8px;
       margin-bottom: 12px;
       width: 100%;
-      max-width: 400px;
+      max-width: 420px;
     }
     .cloze-input-wrap input { flex: 1; text-align: center; font-weight: 600; }
     .fc-answer {
@@ -376,14 +418,12 @@
       padding-top: 14px;
       border-top: 1px dashed var(--border);
       width: 100%;
-      max-width: 560px;
-      display: none;
+      max-width: 600px;
     }
-    .fc-answer.visible { display: block; }
     .fc-meaning {
-      font-size: 1.12rem;
-      font-weight: 700;
+      font-size: 0.92rem;
       color: var(--primary);
+      font-weight: 700;
       margin-bottom: 4px;
     }
     .srs-buttons {
@@ -392,6 +432,7 @@
       gap: 8px;
       margin-top: 16px;
     }
+    .srs-buttons.two { grid-template-columns: repeat(2, 1fr); }
     .srs-btn {
       display: flex;
       flex-direction: column;
@@ -404,6 +445,19 @@
     .srs-hard { border-color: #fcd34d; color: var(--warn); }
     .srs-good { border-color: #93c5fd; color: var(--primary); }
     .srs-easy { border-color: #86efac; color: var(--success); }
+    .srs-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .srs-meta label { display: inline-flex; align-items: center; gap: 5px; }
+    .srs-meta select { padding: 4px 8px; }
+    .kbd-hint { font-size: 0.74rem; color: var(--muted); margin-top: 10px; text-align: center; }
 
     .deck-item {
       display: flex;
@@ -422,9 +476,37 @@
       background: var(--primary-soft);
       color: var(--primary);
       font-weight: 600;
+      white-space: nowrap;
     }
     .badge.due { background: #fef3c7; color: #b45309; }
     .badge.cat { background: #f1f5f9; color: #475569; }
+    .badge.new { background: #f1f5f9; color: #64748b; }
+    .badge.mastered { background: #dcfce7; color: #15803d; }
+
+    .prog-row {
+      display: grid;
+      grid-template-columns: 150px 1fr 74px;
+      gap: 10px;
+      align-items: center;
+      font-size: 0.82rem;
+      margin-bottom: 7px;
+    }
+    .prog-bar {
+      height: 9px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+      display: flex;
+    }
+    .prog-bar i { display: block; height: 100%; }
+    .prog-bar .m { background: var(--success); }
+    .prog-bar .l { background: #60a5fa; }
+    .prog-row .num { text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; }
+    .legend { font-size: 0.76rem; color: var(--muted); margin-top: 8px; }
+    .legend i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin: 0 4px 0 10px; }
+    @media (max-width: 640px) {
+      .prog-row { grid-template-columns: 112px 1fr 62px; }
+    }
 
     .toast {
       position: fixed;
@@ -440,6 +522,8 @@
       pointer-events: none;
       transition: opacity 0.2s;
       z-index: 60;
+      max-width: 92vw;
+      text-align: center;
     }
     .toast.show { opacity: 1; }
   </style>
@@ -447,13 +531,13 @@
 <body>
   <header>
     <div class="header-inner">
-      <div class="brand">EchoDeck <span>v5 · 상황별 5대 테마</span></div>
-      <div class="stats-pill">오늘 복습: <strong id="dueCountBadge">0</strong> · 전체 <strong id="totalCountBadge">0</strong></div>
+      <div class="brand">EchoDeck <span>v6 · 원어민·미드 표현 280</span></div>
+      <div class="stats-pill">복습 <strong id="dueCountBadge">0</strong> · 새 표현 <strong id="newCountBadge">0</strong> · 🔥 <strong id="streakBadge">0</strong>일</div>
     </div>
     <nav class="tabs">
-      <button type="button" class="tab-btn active" data-tab="shadowing">1. 상황별 쉐도잉</button>
-      <button type="button" class="tab-btn" data-tab="srs">2. SRS 복습</button>
-      <button type="button" class="tab-btn" data-tab="deck">3. 상황별 단어장</button>
+      <button type="button" class="tab-btn active" data-tab="shadowing">1. 쉐도잉</button>
+      <button type="button" class="tab-btn" data-tab="srs">2. 오늘의 학습</button>
+      <button type="button" class="tab-btn" data-tab="deck">3. 표현 목록</button>
     </nav>
   </header>
 
@@ -463,30 +547,43 @@
       <div class="card">
         <div class="card-title">
           <span>상황별 핵심 문장 쉐도잉</span>
-          <button type="button" id="resetAllPresetBtn" class="sm">🔄 기본 5개 상황 복원</button>
         </div>
 
-        <div class="chip-row" id="shadowingCategoryChips"></div>
+        <div class="chip-row" id="shadowCatChips"></div>
 
         <div class="controls-bar">
-          <select id="scriptSelect"></select>
-          <label style="font-size:0.82rem; color:var(--muted);">속도
+          <select id="setSelect"></select>
+          <button type="button" id="seqPlayBtn" class="sm primary">▶ 연속 쉐도잉</button>
+          <button type="button" id="stopBtn" class="sm">⏹ 정지</button>
+          <label>속도
             <select id="rateSelect">
-              <option value="0.75">0.75x</option>
-              <option value="0.9">0.9x</option>
-              <option value="1" selected>1.0x</option>
+              <option value="0.7">0.7x</option>
+              <option value="0.85">0.85x</option>
+              <option value="1">1.0x</option>
               <option value="1.15">1.15x</option>
             </select>
           </label>
-          <button type="button" id="stopSpeechBtn" class="sm">⏹ 정지</button>
+          <label>문장당
+            <select id="repeatSelect">
+              <option value="1">1회</option>
+              <option value="2">2회</option>
+              <option value="3">3회</option>
+            </select>
+          </label>
+          <label>음성 <select id="voiceSelect"></select></label>
+        </div>
+        <div class="controls-bar last">
+          <label><input type="checkbox" id="gapToggle" /> 따라 말할 틈 두기</label>
+          <label><input type="checkbox" id="hideEnToggle" /> 영어 가리기 (듣기 훈련)</label>
+          <label><input type="checkbox" id="hideKoToggle" /> 해석 가리기</label>
           <button type="button" id="toggleYtSetupBtn" class="sm">🎬 YouTube 연결</button>
-          <button type="button" id="toggleAddScriptBtn" class="sm">+ 문장 추가</button>
+          <button type="button" id="toggleAddBtn" class="sm">+ 내 문장 추가</button>
         </div>
 
-        <!-- YouTube URL Setup Drawer -->
         <div id="ytSetupBox" class="quick-box">
-          <strong>현재 상황에 YouTube 영상 연결 (GitHub Pages https:// 환경 권장)</strong>
-          <div class="form-grid" style="margin-top:8px;">
+          <strong>현재 상황에 YouTube 영상 연결</strong>
+          <div style="font-size:0.8rem; color:var(--muted); margin-top:4px;">'내 문장'에 시작·종료 초를 입력하면 해당 구간이 영상 원음으로 재생됩니다. (https:// 환경 필요)</div>
+          <div class="form-grid">
             <input type="text" id="ytUrlInput" placeholder="예: https://youtu.be/영상ID 또는 11자리 ID" />
             <div style="display:flex; gap:6px;">
               <button type="button" id="applyYtBtn" class="primary sm">영상 적용</button>
@@ -495,7 +592,6 @@
           </div>
         </div>
 
-        <!-- YouTube Player -->
         <div id="ytPlayerBox" class="yt-box">
           <div class="yt-aspect">
             <div id="ytPlayerContainer"></div>
@@ -506,24 +602,22 @@
           </div>
         </div>
 
-        <!-- Custom Sentence Add -->
-        <div id="customScriptBox" class="quick-box">
-          <strong>현재 상황 스크립트에 새 문장 추가</strong>
+        <div id="customBox" class="quick-box">
+          <strong>현재 상황에 내 문장 추가 (SRS에도 자동 등록)</strong>
           <div class="form-grid-4">
-            <input type="text" id="newEnSentence" placeholder="영어 문장" />
-            <input type="text" id="newKoSentence" placeholder="한국어 해석" />
-            <input type="number" id="newStartSec" step="0.1" placeholder="시작(초)" />
-            <input type="number" id="newEndSec" step="0.1" placeholder="종료(초)" />
+            <input type="text" id="newEn" placeholder="영어 문장" />
+            <input type="text" id="newKo" placeholder="한국어 해석" />
+            <input type="number" id="newStart" step="0.1" placeholder="시작(초)" />
+            <input type="number" id="newEnd" step="0.1" placeholder="종료(초)" />
           </div>
           <div style="margin-top:8px;">
-            <button type="button" id="saveCustomSentenceBtn" class="primary sm">문장 등록</button>
+            <button type="button" id="saveCustomBtn" class="primary sm">문장 등록</button>
           </div>
         </div>
 
-        <!-- Dictionary Lookup & Quick Word Save -->
         <div id="quickWordBox" class="quick-box">
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <strong>사전 조회 & 상황별 단어장 담기</strong>
+            <strong>사전 조회 & 내 단어로 저장</strong>
             <button type="button" id="closeQuickWordBtn" class="sm">닫기</button>
           </div>
           <div id="dictPreview" class="dict-preview">단어를 불러오는 중...</div>
@@ -532,10 +626,10 @@
             <input type="text" id="qwMeaning" placeholder="한국어 뜻 입력" />
             <select id="qwCategory"></select>
             <input type="text" id="qwIpa" placeholder="발음기호 (자동 채움)" />
-            <input type="text" id="qwExample" placeholder="예문" style="grid-column: 1 / -1;" />
+            <input type="text" id="qwExample" class="full" placeholder="예문" />
           </div>
           <div style="margin-top:8px; display:flex; gap:8px;">
-            <button type="button" id="qwSaveBtn" class="primary sm">SRS 단어장에 저장</button>
+            <button type="button" id="qwSaveBtn" class="primary sm">SRS에 저장</button>
             <button type="button" id="qwSpeakBtn" class="sm">🔊 발음 듣기</button>
           </div>
         </div>
@@ -544,52 +638,78 @@
       </div>
     </section>
 
-    <!-- TAB 2: SRS REVIEW -->
+    <!-- TAB 2: SRS -->
     <section id="view-srs" class="view">
       <div class="card">
         <div class="card-title">
-          <span>간격 반복(SRS) 복습 큐</span>
-          <div class="mode-switch">
-            <button type="button" id="modeFlipBtn" class="sm primary">플래시카드</button>
-            <button type="button" id="modeClozeBtn" class="sm">빈칸 타이핑</button>
-            <button type="button" id="practiceAllBtn" class="sm">전체 연습</button>
+          <span>오늘의 학습 (간격 반복)</span>
+          <div class="mode-switch" id="modeSwitch">
+            <button type="button" class="sm" data-mode="speak">한→영 말하기</button>
+            <button type="button" class="sm" data-mode="listen">듣고 이해</button>
+            <button type="button" class="sm" data-mode="read">영→한</button>
+            <button type="button" class="sm" data-mode="cloze">빈칸 타이핑</button>
           </div>
         </div>
-        <div class="chip-row" id="srsCategoryChips"></div>
+        <div class="chip-row" id="srsCatChips"></div>
+        <div class="srs-meta">
+          <span id="srsCountText"></span>
+          <span style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <label>하루 새 표현
+              <select id="newPerDaySelect">
+                <option value="5">5개</option>
+                <option value="10">10개</option>
+                <option value="15">15개</option>
+                <option value="20">20개</option>
+                <option value="30">30개</option>
+              </select>
+            </label>
+            <button type="button" id="cramBtn" class="sm">자유 연습</button>
+          </span>
+        </div>
         <div id="srsContainer"></div>
+        <div class="kbd-hint">키보드: Space 정답 확인 · 1 Again · 2 Hard · 3 Good · 4 Easy</div>
       </div>
     </section>
 
-    <!-- TAB 3: DECK MANAGEMENT -->
+    <!-- TAB 3: DECK -->
     <section id="view-deck" class="view">
       <div class="card">
         <div class="card-title">
-          <span>새 표현 직접 추가</span>
+          <span>학습 진도</span>
+          <span id="progSummary" style="font-size:0.82rem; font-weight:400; color:var(--muted);"></span>
         </div>
+        <div id="progList"></div>
+        <div class="legend"><i style="background:var(--success); margin-left:0;"></i>익힘(간격 21일+)<i style="background:#60a5fa;"></i>학습 중</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span>내 표현 직접 추가</span></div>
         <div class="form-grid">
           <input type="text" id="addExpr" placeholder="영어 표현 (예: on the same page)" />
-          <input type="text" id="addMeaning" placeholder="한국어 뜻 (예: 같은 생각인, 의견이 일치하는)" />
+          <input type="text" id="addMeaning" placeholder="한국어 뜻" />
           <select id="addCategory"></select>
           <input type="text" id="addIpa" placeholder="발음기호 (선택)" />
-          <input type="text" id="addExample" placeholder="예문 입력" style="grid-column: 1 / -1;" />
+          <input type="text" id="addExample" class="full" placeholder="영어 예문 (선택)" />
+          <input type="text" id="addExampleKo" class="full" placeholder="예문 해석 (선택)" />
         </div>
         <div style="margin-top:10px;">
-          <button type="button" id="addCardBtn" class="primary">단어장에 추가</button>
+          <button type="button" id="addCardBtn" class="primary">추가</button>
         </div>
       </div>
 
       <div class="card">
         <div class="card-title">
-          <span>상황별 단어·표현장</span>
+          <span>전체 표현</span>
           <div style="display:flex; flex-wrap:wrap; gap:6px;">
             <button type="button" id="exportJsonBtn" class="sm">JSON 백업</button>
-            <label class="sm" style="border:1px solid var(--border); padding:5px 10px; border-radius:9px; font-size:0.78rem; font-weight:600; cursor:pointer; background:#fff;">
+            <label style="border:1px solid var(--border); padding:5px 10px; border-radius:9px; font-size:0.78rem; font-weight:600; cursor:pointer; background:#fff;">
               JSON 복원
               <input type="file" id="importJsonInput" accept=".json" style="display:none;" />
             </label>
+            <button type="button" id="resetProgressBtn" class="sm danger">진도 초기화</button>
           </div>
         </div>
-        <div class="chip-row" id="deckCategoryChips"></div>
+        <div class="chip-row" id="deckCatChips"></div>
         <input type="text" id="deckSearchInput" placeholder="표현, 뜻, 예문 검색..." style="width:100%; margin-bottom:12px;" />
         <div id="deckList"></div>
       </div>
@@ -599,1071 +719,1483 @@
   <div id="toast" class="toast"></div>
 
   <script>
-    (function() {
-      const STORAGE_KEY = "echodeck_cards_v5";
-      const SCRIPTS_KEY = "echodeck_scripts_v5";
+  (function () {
+    "use strict";
 
-      const CATEGORY_META = [
-        { key: "all", label: "전체" },
-        { key: "business", label: "💼 비즈니스·회의" },
-        { key: "daily", label: "☕ 일상·스몰토크" },
-        { key: "travel", label: "✈️ 여행·식당·쇼핑" },
-        { key: "email", label: "📧 이메일·전화 응대" },
-        { key: "opinion", label: "💬 의견 제시·토론" }
-      ];
+    /* ================================================================
+       1. 콘텐츠
+       한 줄 = [핵심 표현, 뜻, 예문(핵심 구간을 {중괄호}로 표시), 해석]
+       문장을 늘리려면 해당 카테고리 배열 "끝에" 줄을 추가하세요.
+       (중간에 끼워 넣으면 기존 학습 기록의 번호가 밀립니다.)
+       ================================================================ */
+    const CATS = [
+      { key: "business", label: "💼 회의·업무" },
+      { key: "daily",    label: "☕ 일상·스몰토크" },
+      { key: "react",    label: "🙌 리액션·맞장구" },
+      { key: "feelings", label: "😊 감정·컨디션" },
+      { key: "request",  label: "🙏 부탁·사과·거절" },
+      { key: "plans",    label: "📅 약속·모임" },
+      { key: "travel",   label: "✈️ 여행·식당·쇼핑" },
+      { key: "email",    label: "📧 이메일·전화" },
+      { key: "opinion",  label: "💬 의견·토론" },
+      { key: "life",     label: "🏠 생활·건강·돈" },
+      { key: "drama",    label: "🎬 미드 단골 한마디" },
+      { key: "conflict", label: "🔥 미드 갈등·다툼" },
+      { key: "romance",  label: "❤️ 미드 연애·관계" },
+      { key: "crisis",   label: "🚨 미드 사건·긴박한 순간" }
+    ];
 
-      function getCategoryLabel(key) {
-        const found = CATEGORY_META.find(c => c.key === key);
-        return found ? found.label : "💼 비즈니스·회의";
+    const PRESET = {
+      business: [
+        ["on the same page", "같은 생각인, 이해가 일치하는", "Let's make sure we're all {on the same page} before moving forward.", "다음 단계로 넘어가기 전에 모두 같은 생각인지 확인합시다."],
+        ["pull off", "(어려운 일을) 해내다", "I didn't think she could {pull off} the presentation on such short notice.", "그렇게 촉박했는데 그녀가 발표를 해낼 줄은 몰랐어요."],
+        ["walk someone through", "~에게 차근차근 설명해 주다", "Could you {walk me through} the updated schedule step by step?", "바뀐 일정을 단계별로 차근차근 설명해 주실 수 있나요?"],
+        ["circle back to", "(나중에) ~을 다시 논의하다", "Let's {circle back to} that issue once we gather more data.", "데이터를 좀 더 모은 뒤에 그 문제를 다시 이야기하죠."],
+        ["take the lead", "주도하다, 앞장서다", "Would you mind {taking the lead} on this project?", "이 프로젝트를 주도적으로 맡아 주실 수 있을까요?"],
+        ["wrap up", "마무리하다", "Let's {wrap up} the meeting. We're running out of time.", "회의를 마무리합시다. 시간이 얼마 안 남았어요."],
+        ["on track", "계획대로 진행 중인", "Are we still {on track} to launch next month?", "다음 달 출시는 여전히 계획대로 가고 있나요?"],
+        ["bring up", "(화제를) 꺼내다", "I'd like to {bring up} one more thing before we finish.", "끝내기 전에 한 가지만 더 말씀드리고 싶어요."],
+        ["heads-up", "미리 알림, 귀띔", "Just a quick {heads-up}: the client moved the deadline to Friday.", "미리 알려 드려요. 고객사가 마감을 금요일로 옮겼어요."],
+        ["loop someone in", "~를 논의에 포함시키다", "Can you {loop me in} on that email thread?", "그 메일 스레드에 저도 넣어 주실래요?"],
+        ["have a lot on one's plate", "할 일이 산더미다", "I {have a lot on my plate} this week, so can it wait until Monday?", "이번 주는 할 일이 너무 많은데, 월요일까지 기다려 줄 수 있어요?"],
+        ["follow up on", "~을 후속 확인하다", "I'll {follow up on} that with the design team this afternoon.", "그 건은 오늘 오후에 디자인팀에 다시 확인해 볼게요."],
+        ["run something by someone", "~에게 의견을 구하다", "Let me {run this by} my manager before I commit.", "확답드리기 전에 팀장님께 한번 여쭤볼게요."],
+        ["fill in for", "~를 대신하다", "Can you {fill in for} me at tomorrow's meeting?", "내일 회의에 저 대신 들어가 줄 수 있어요?"],
+        ["up to speed", "최신 상황을 파악한", "Give me a day to get {up to speed} on the project.", "프로젝트 상황을 파악할 수 있게 하루만 주세요."],
+        ["push back", "(일정을) 미루다", "We need to {push back} the launch by two weeks.", "출시를 2주 미뤄야 해요."],
+        ["ballpark figure", "대략적인 수치", "Can you give me a {ballpark figure} for the total cost?", "총비용이 대략 얼마쯤인지 알려 줄 수 있어요?"],
+        ["game plan", "실행 계획, 작전", "So what's our {game plan} for the next quarter?", "그래서 다음 분기 우리 계획이 뭐죠?"],
+        ["take it from here", "여기서부터 맡다", "Thanks for the intro. I'll {take it from here}.", "소개 감사합니다. 여기서부터는 제가 맡을게요."],
+        ["slip one's mind", "깜빡하다", "Sorry, it completely {slipped my mind}. I'll send it right now.", "죄송해요, 완전히 깜빡했어요. 지금 바로 보낼게요."]
+      ],
+      daily: [
+        ["take a rain check", "다음 기회로 미루다", "Something urgent came up at work, so I'll have to {take a rain check}.", "회사에 급한 일이 생겨서 다음으로 미뤄야겠어요."],
+        ["get the hang of", "~의 요령을 익히다", "It took me a while to {get the hang of} the new system.", "새 시스템에 익숙해지는 데 시간이 좀 걸렸어요."],
+        ["beat yourself up", "자책하다", "Don't {beat yourself up} over a minor mistake.", "사소한 실수로 너무 자책하지 마세요."],
+        ["call it a day", "오늘 일을 마치다", "We've made great progress, so let's {call it a day}.", "많이 진행했으니 오늘은 이만하죠."],
+        ["How's it going?", "어떻게 지내?", "Hey, {how's it going}? I haven't seen you in ages.", "야, 잘 지내? 진짜 오랜만에 본다."],
+        ["What have you been up to?", "요즘 뭐 하고 지냈어?", "So, {what have you been up to} lately?", "그래서 요즘 어떻게 지냈어?"],
+        ["catch up", "밀린 이야기를 나누다", "We should grab coffee and {catch up} sometime.", "언제 커피 한잔하면서 밀린 얘기 좀 하자."],
+        ["hang out", "어울려 놀다", "Do you want to {hang out} this weekend?", "이번 주말에 같이 놀래?"],
+        ["sleep in", "늦잠 자다", "I'm planning to {sleep in} on Saturday.", "토요일엔 늦잠 잘 생각이야."],
+        ["run errands", "볼일을 보다", "I have to {run a few errands} before dinner.", "저녁 먹기 전에 볼일 몇 가지 봐야 해."],
+        ["be into", "~에 푹 빠져 있다", "I'm really {into} cooking these days.", "요즘 요리에 푹 빠져 있어."],
+        ["no wonder", "그럴 만도 하네", "You stayed up until three? {No wonder} you're tired.", "세 시까지 안 잤다고? 피곤할 만도 하네."],
+        ["It's been a while", "오랜만이야", "{It's been a while}! How have you been?", "오랜만이다! 어떻게 지냈어?"],
+        ["It's been a long day", "힘든 하루였어", "{It's been a long day}. I just want to go home and relax.", "힘든 하루였어. 그냥 집에 가서 쉬고 싶다."],
+        ["same old", "늘 똑같은", "Not much, just the {same old} routine.", "별일 없어, 늘 똑같은 일상이지 뭐."],
+        ["binge-watch", "몰아 보다", "I {binge-watched} the whole season over the weekend.", "주말 동안 시즌 전체를 몰아 봤어."],
+        ["feel like -ing", "~하고 싶다", "I don't {feel like} cooking tonight. Let's order in.", "오늘 저녁은 요리하기 싫다. 시켜 먹자."],
+        ["run into", "우연히 마주치다", "Guess who I {ran into} at the grocery store?", "마트에서 내가 누구 마주쳤는지 알아?"],
+        ["time flies", "시간 참 빠르다", "I can't believe it's already December. {Time flies}!", "벌써 12월이라니 믿기지 않아. 시간 참 빠르다!"],
+        ["take it easy", "쉬엄쉬엄 해, 잘 지내", "{Take it easy}. I'll see you next week.", "잘 지내. 다음 주에 보자."]
+      ],
+      react: [
+        ["No way!", "말도 안 돼!", "{No way}! You got the job? Congratulations!", "말도 안 돼! 합격했어? 축하해!"],
+        ["That's a bummer", "아쉽네, 안됐다", "You can't make it? {That's a bummer}.", "못 온다고? 아쉽네."],
+        ["Good for you", "잘됐다!", "You finally quit smoking? {Good for you}!", "드디어 담배 끊었어? 잘됐다!"],
+        ["Tell me about it", "내 말이 (격한 공감)", "“Mondays are the worst.” “{Tell me about it}.”", "“월요일이 제일 싫어.” “내 말이.”"],
+        ["I know, right?", "그러니까!", "“This place is amazing.” “{I know, right}?”", "“여기 진짜 좋다.” “그치?”"],
+        ["fair enough", "그럴 만하네, 알겠어", "{Fair enough}. Let's do it your way.", "그럴 만하네. 네 방식대로 하자."],
+        ["You're kidding", "농담이지?", "{You're kidding}! They canceled the whole trip?", "농담이지? 여행을 통째로 취소했다고?"],
+        ["That's what I thought", "나도 그렇게 생각했어", "{That's what I thought}, but I wanted to double-check.", "나도 그렇게 생각했는데, 한 번 더 확인하고 싶었어."],
+        ["no worries", "괜찮아, 걱정 마", "{No worries}. Take your time.", "괜찮아. 천천히 해."],
+        ["Sounds good", "좋아", "“Let's meet at six.” “{Sounds good} to me.”", "“여섯 시에 만나자.” “난 좋아.”"],
+        ["I'm down", "나도 할래", "Pizza and a movie? {I'm down}.", "피자에 영화? 나도 콜."],
+        ["You bet", "물론이지", "“Can you give me a ride?” “{You bet}.”", "“나 좀 태워 줄 수 있어?” “물론이지.”"],
+        ["I get it", "이해해", "{I get it}. You need some time to think.", "이해해. 생각할 시간이 필요하구나."],
+        ["It happens", "그럴 수도 있지", "Don't worry about it. {It happens} to everyone.", "신경 쓰지 마. 누구나 그럴 수 있어."],
+        ["That's a relief", "다행이다", "Nobody was hurt? {That's a relief}.", "아무도 안 다쳤어? 다행이다."],
+        ["You can say that again", "정말 그래 (강한 동의)", "“It's freezing today.” “{You can say that again}.”", "“오늘 진짜 춥다.” “정말 그래.”"],
+        ["Are you serious?", "진짜야?", "{Are you serious}? That's incredible!", "진짜야? 대단하다!"],
+        ["Good to know", "알아 두면 좋겠네", "Oh, they close at nine? {Good to know}.", "아, 아홉 시에 닫아? 알아 둬야겠네."],
+        ["I figured", "그럴 줄 알았어", "“Sorry, I was stuck in traffic.” “Yeah, {I figured}.”", "“미안, 차가 막혔어.” “응, 그럴 줄 알았어.”"],
+        ["My bad", "내 잘못이야", "Oops, {my bad}. I thought the meeting was at three.", "앗, 내 실수. 회의가 세 시인 줄 알았어."]
+      ],
+      feelings: [
+        ["stressed out", "스트레스를 많이 받은", "I've been really {stressed out} about the deadline.", "마감 때문에 스트레스를 엄청 받고 있어."],
+        ["under the weather", "몸이 좀 안 좋은", "I'm feeling a bit {under the weather} today.", "오늘 몸이 좀 안 좋아."],
+        ["worn out", "녹초가 된", "I'm completely {worn out} after that hike.", "등산하고 나서 완전히 녹초가 됐어."],
+        ["in a good mood", "기분이 좋은", "You seem to be {in a good mood} today. What's up?", "오늘 기분 좋아 보이네. 무슨 일이야?"],
+        ["fed up with", "~에 진절머리가 난", "I'm {fed up with} this traffic.", "이 교통 체증 정말 지긋지긋해."],
+        ["can't wait", "너무 기대된다", "I {can't wait} to see you guys next week!", "다음 주에 너희 볼 생각에 너무 설레!"],
+        ["get on one's nerves", "신경을 거슬리게 하다", "That noise is really {getting on my nerves}.", "저 소음 진짜 신경 거슬려."],
+        ["freak out", "기겁하다, 크게 당황하다", "I {freaked out} when I couldn't find my passport.", "여권이 안 보여서 완전 멘붕이었어."],
+        ["over the moon", "너무 행복한", "She was {over the moon} when she heard the news.", "그 소식을 듣고 그녀는 뛸 듯이 기뻐했어."],
+        ["have mixed feelings", "심정이 복잡하다", "I {have mixed feelings} about moving abroad.", "해외로 이사 가는 게 좋기도 하고 걱정도 돼."],
+        ["a weight off one's shoulders", "한시름 놓음", "Finishing that report was {a weight off my shoulders}.", "그 보고서를 끝내니 한시름 놓였어."],
+        ["burned out", "번아웃된, 완전히 지친", "I think I'm getting {burned out}. I need a real vacation.", "번아웃이 오는 것 같아. 제대로 된 휴가가 필요해."],
+        ["make someone's day", "~의 하루를 행복하게 하다", "Thank you so much. You just {made my day}.", "정말 고마워. 덕분에 오늘 하루가 행복해졌어."],
+        ["let someone down", "~를 실망시키다", "I don't want to {let you down}.", "널 실망시키고 싶지 않아."],
+        ["blow off steam", "스트레스를 풀다", "I go for a run to {blow off steam}.", "난 스트레스 풀려고 달리기를 해."],
+        ["not in the mood", "~할 기분이 아닌", "Sorry, I'm {not in the mood} for jokes right now.", "미안, 지금은 농담할 기분이 아니야."],
+        ["cheer someone up", "~의 기운을 북돋다", "I brought you some coffee to {cheer you up}.", "기운 내라고 커피 사 왔어."],
+        ["butterflies in one's stomach", "긴장돼서 떨림", "I always get {butterflies in my stomach} before a big presentation.", "큰 발표 전에는 항상 긴장돼서 떨려."],
+        ["get over", "극복하다, 털어내다", "It took me a while to {get over} that cold.", "그 감기가 낫는 데 꽤 걸렸어."],
+        ["hang in there", "조금만 버텨", "{Hang in there}. It'll get better soon.", "조금만 버텨. 곧 나아질 거야."]
+      ],
+      request: [
+        ["Would you mind -ing?", "~해 주실 수 있을까요?", "{Would you mind} turning the volume down a little?", "소리 좀 줄여 주실 수 있을까요?"],
+        ["do me a favor", "부탁을 들어주다", "Could you {do me a favor} and watch my bag for a minute?", "부탁인데 제 가방 좀 잠깐 봐 주실래요?"],
+        ["give someone a hand", "~를 도와주다", "Can you {give me a hand} with these boxes?", "이 상자들 옮기는 것 좀 도와줄래?"],
+        ["I was wondering if", "혹시 ~할 수 있을까 해서요", "{I was wondering if} you could cover my shift on Friday.", "혹시 금요일에 제 근무를 대신해 주실 수 있을까 해서요."],
+        ["I'd appreciate it if", "~해 주시면 감사하겠습니다", "{I'd appreciate it if} you could send it by noon.", "정오까지 보내 주시면 감사하겠습니다."],
+        ["I didn't mean to", "~하려던 건 아니었어요", "I'm sorry. {I didn't mean to} interrupt you.", "죄송해요. 말씀을 끊으려던 건 아니었어요."],
+        ["make it up to", "~에게 만회하다, 보상하다", "I'm sorry I missed your birthday. Let me {make it up to} you.", "생일 못 챙겨서 미안해. 내가 만회할게."],
+        ["I'd love to, but", "그러고 싶지만", "{I'd love to, but} I already have plans that night.", "그러고 싶은데 그날 저녁엔 이미 약속이 있어."],
+        ["I'll pass", "난 사양할게", "I think {I'll pass} this time. I'm exhausted.", "이번엔 난 빠질게. 너무 피곤해."],
+        ["Is it okay if", "~해도 될까요?", "{Is it okay if} I leave a little early today?", "오늘 조금 일찍 퇴근해도 될까요?"],
+        ["take your time", "천천히 하세요", "{Take your time}. There's no rush.", "천천히 하세요. 급할 것 없어요."],
+        ["Sorry to bother you", "방해해서 죄송한데요", "{Sorry to bother you}, but do you have a minute?", "방해해서 죄송한데, 잠깐 시간 되세요?"],
+        ["if it's not too much trouble", "너무 번거롭지 않다면", "Could you drop me off at the station, {if it's not too much trouble}?", "너무 번거롭지 않으시면 역에 내려 주실 수 있나요?"],
+        ["owe someone one", "~에게 신세 지다", "Thanks for covering for me. I {owe you one}.", "대신해 줘서 고마워. 신세 졌네."],
+        ["Don't mention it", "별말씀을요", "“Thanks for the ride.” “{Don't mention it}.”", "“태워 줘서 고마워.” “별말씀을.”"],
+        ["should have", "~했어야 했는데", "I {should have} told you earlier. I'm sorry.", "더 일찍 말했어야 했는데. 미안해."],
+        ["count on", "~를 믿고 의지하다", "You can {count on} me. I'll be there.", "나만 믿어. 꼭 갈게."],
+        ["I'm afraid", "유감이지만, 죄송하지만", "{I'm afraid} I can't make it to the meeting tomorrow.", "죄송하지만 내일 회의에는 참석이 어려울 것 같아요."],
+        ["let me see what I can do", "제가 할 수 있는 걸 알아볼게요", "I can't promise anything, but {let me see what I can do}.", "장담은 못 하지만, 제가 한번 알아볼게요."],
+        ["help yourself", "마음껏 드세요", "There are snacks in the kitchen. {Help yourself}.", "부엌에 간식 있어요. 마음껏 드세요."]
+      ],
+      plans: [
+        ["Are you free", "시간 돼?", "{Are you free} this Saturday afternoon?", "이번 토요일 오후에 시간 돼?"],
+        ["make it", "(약속에) 가다, 참석하다", "I'm sorry, I can't {make it} tonight.", "미안, 오늘 밤엔 못 갈 것 같아."],
+        ["work for someone", "(일정이) ~에게 괜찮다", "Does Thursday at two {work for you}?", "목요일 두 시 괜찮으세요?"],
+        ["running late", "늦고 있는", "I'm {running late}. I'll be there in ten minutes.", "나 좀 늦어. 10분 안에 도착할게."],
+        ["on my way", "가는 중", "I'm {on my way}. See you soon.", "지금 가는 중이야. 곧 봐."],
+        ["pick someone up", "~를 데리러 가다", "I can {pick you up} around six.", "여섯 시쯤 데리러 갈 수 있어."],
+        ["show up", "나타나다", "He didn't {show up} until the party was almost over.", "그는 파티가 거의 끝날 때까지 나타나지 않았어."],
+        ["play it by ear", "상황 봐서 정하다", "We don't need a plan. Let's just {play it by ear}.", "계획은 필요 없어. 그냥 상황 봐서 정하자."],
+        ["come over", "(집에) 놀러 오다", "Why don't you {come over} for dinner on Friday?", "금요일에 우리 집에 저녁 먹으러 올래?"],
+        ["something came up", "일이 생겼어", "I'm so sorry, {something came up}. Can we reschedule?", "정말 미안, 일이 좀 생겼어. 다시 날짜 잡아도 될까?"],
+        ["count me in", "나도 끼워 줘", "A beach trip? {Count me in}!", "바다 여행? 나도 끼워 줘!"],
+        ["It's on me", "내가 살게", "Put your wallet away. {It's on me} today.", "지갑 넣어 둬. 오늘은 내가 살게."],
+        ["up for", "~할 마음이 있는", "Are you {up for} a movie tonight?", "오늘 밤에 영화 볼 생각 있어?"],
+        ["at the last minute", "막판에", "She canceled {at the last minute}.", "그녀가 막판에 취소했어."],
+        ["swing by", "잠깐 들르다", "I'll {swing by} your office after lunch.", "점심 먹고 네 사무실에 잠깐 들를게."],
+        ["Should I bring anything?", "뭐 가져갈까?", "{Should I bring anything} to the party?", "파티에 뭐 가져갈까?"],
+        ["be supposed to", "~하기로 되어 있다", "We're {supposed to} meet at the station at five.", "우리 다섯 시에 역에서 만나기로 했어."],
+        ["head out", "출발하다, 나가다", "I'm about to {head out}. Do you need anything?", "나 이제 나가려는데, 필요한 거 있어?"],
+        ["get together", "모이다, 만나다", "We should {get together} more often.", "우리 더 자주 모여야겠다."],
+        ["call it a night", "오늘 밤은 이만하다", "It's getting late. Let's {call it a night}.", "시간이 늦었네. 오늘은 이만하자."]
+      ],
+      travel: [
+        ["under + 이름", "~의 이름으로 (예약된)", "Hi, I have a reservation {under Kim}.", "안녕하세요, 김이라는 이름으로 예약했어요."],
+        ["grab a bite", "간단히 먹다", "Do you know any good places around here to {grab a quick bite}?", "이 근처에 간단히 먹을 만한 괜찮은 곳 아세요?"],
+        ["try on", "입어 보다, 신어 보다", "Could I {try this jacket on} in a medium?", "이 재킷 미디엄 사이즈로 입어 봐도 될까요?"],
+        ["split the bill", "나눠서 계산하다", "Could we {split the bill}, please?", "계산을 나눠서 할 수 있을까요?"],
+        ["For here or to go?", "드시고 가세요, 포장이세요?", "“{For here or to go}?” “To go, please.”", "“드시고 가세요, 포장이세요?” “포장이요.”"],
+        ["I'll have", "~로 주세요 (주문)", "{I'll have} the grilled salmon with a side salad.", "연어구이에 사이드 샐러드로 주세요."],
+        ["Can I get", "~ 주시겠어요?", "{Can I get} an iced americano with an extra shot?", "아이스 아메리카노에 샷 추가해서 주시겠어요?"],
+        ["a table for two", "두 명 자리", "Do you have {a table for two} around seven?", "일곱 시쯤 두 명 자리 있나요?"],
+        ["just looking", "그냥 구경 중", "I'm {just looking} around, thanks.", "그냥 둘러보는 중이에요, 감사합니다."],
+        ["on sale", "할인 중인", "Are these shoes {on sale} too?", "이 신발도 할인 중인가요?"],
+        ["Can we get the check?", "계산서 주시겠어요?", "Excuse me, {can we get the check}, please?", "저기요, 계산서 좀 주시겠어요?"],
+        ["How do I get to", "~에 어떻게 가나요?", "Excuse me, {how do I get to} the nearest subway station?", "실례합니다, 가장 가까운 지하철역은 어떻게 가나요?"],
+        ["within walking distance", "걸어갈 수 있는 거리인", "Is the museum {within walking distance} from here?", "박물관이 여기서 걸어갈 만한 거리인가요?"],
+        ["What do you recommend?", "뭘 추천하세요?", "Everything looks great. {What do you recommend}?", "다 맛있어 보이네요. 뭘 추천하세요?"],
+        ["allergic to", "~에 알레르기가 있는", "I'm {allergic to} peanuts. Does this dish contain any?", "제가 땅콩 알레르기가 있는데, 이 요리에 들어가나요?"],
+        ["check a bag", "짐을 부치다", "I'd like to {check one bag} and carry this one on.", "가방 하나는 부치고 이건 들고 탈게요."],
+        ["aisle seat", "통로 쪽 좌석", "Could I get an {aisle seat} if one is available?", "가능하면 통로 쪽 좌석으로 받을 수 있을까요?"],
+        ["late checkout", "늦은 체크아웃", "Is it possible to get a {late checkout} tomorrow?", "내일 체크아웃을 늦게 할 수 있을까요?"],
+        ["get a refund", "환불받다", "I'd like to return this. Can I {get a refund}?", "이거 반품하고 싶은데, 환불받을 수 있나요?"],
+        ["Could you take a picture of us?", "사진 좀 찍어 주시겠어요?", "{Could you take a picture of us}, please?", "저희 사진 좀 찍어 주시겠어요?"]
+      ],
+      email: [
+        ["get back to", "~에게 다시 연락하다", "Thank you for reaching out. I'll {get back to} you by tomorrow afternoon.", "연락 주셔서 감사합니다. 내일 오후까지 회신드리겠습니다."],
+        ["put someone through", "(전화를) ~에게 연결해 주다", "Please hold while I {put you through} to the manager.", "매니저님께 연결해 드릴 테니 잠시만 기다려 주세요."],
+        ["touch base", "(상황 확인차) 연락하다", "I'm just writing to {touch base} about our project deadline.", "프로젝트 마감 건으로 확인차 연락드립니다."],
+        ["keep someone posted", "~에게 계속 진행 상황을 알리다", "We're looking into the issue and will {keep you posted}.", "문제를 확인 중이며 진행 상황을 계속 알려 드리겠습니다."],
+        ["reach out", "연락하다", "Feel free to {reach out} if you have any questions.", "궁금한 점이 있으면 편하게 연락 주세요."],
+        ["I'm calling about", "~ 건으로 전화드렸습니다", "Hi, {I'm calling about} the invoice you sent last week.", "안녕하세요, 지난주에 보내 주신 청구서 건으로 전화드렸습니다."],
+        ["May I ask who's calling?", "누구신지 여쭤봐도 될까요?", "{May I ask who's calling}, please?", "실례지만 누구신지 여쭤봐도 될까요?"],
+        ["leave a message", "메시지를 남기다", "She's not available right now. Would you like to {leave a message}?", "지금은 자리에 안 계신데, 메시지 남기시겠어요?"],
+        ["Please find attached", "첨부 파일을 확인해 주세요", "{Please find attached} the report for your review.", "검토하실 보고서를 첨부해 드립니다."],
+        ["look forward to", "~을 기대하다", "I {look forward to} hearing from you soon.", "곧 답변 주시기를 기다리겠습니다."],
+        ["As we discussed", "논의한 대로", "{As we discussed}, I've updated the proposal.", "논의한 대로 제안서를 수정했습니다."],
+        ["at your earliest convenience", "가급적 빨리, 편하실 때", "Please reply {at your earliest convenience}.", "편하실 때 가급적 빨리 회신 부탁드립니다."],
+        ["a friendly reminder", "가벼운 리마인드", "Just {a friendly reminder} that the form is due tomorrow.", "양식 제출 기한이 내일까지라는 점 다시 한번 알려 드립니다."],
+        ["cc someone", "~를 참조로 넣다", "I've {cc'd} my manager so she's in the loop.", "팀장님도 내용을 아시도록 참조로 넣었습니다."],
+        ["break up", "(통화가) 끊기다", "Sorry, you're {breaking up}. Could you say that again?", "죄송한데 소리가 끊겨요. 다시 말씀해 주시겠어요?"],
+        ["Is now a good time?", "지금 통화 괜찮으세요?", "Hi, it's Minji. {Is now a good time} to talk?", "안녕하세요, 민지예요. 지금 통화 괜찮으세요?"],
+        ["call back", "다시 전화하다", "I'm in a meeting. Can I {call you back} in an hour?", "지금 회의 중이라서요. 한 시간 뒤에 다시 전화드려도 될까요?"],
+        ["let me know", "알려 주세요", "Please {let me know} if Tuesday works for you.", "화요일이 괜찮으신지 알려 주세요."],
+        ["Sorry for the late reply", "답장이 늦어 죄송합니다", "{Sorry for the late reply}. I was out of the office last week.", "답장이 늦어 죄송합니다. 지난주에 부재중이었습니다."],
+        ["Thanks in advance", "미리 감사드립니다", "{Thanks in advance} for your help with this.", "도와주셔서 미리 감사드립니다."]
+      ],
+      opinion: [
+        ["from my perspective", "제 관점에서는", "{From my perspective}, user experience should be our top priority.", "제 관점에서는 사용자 경험이 최우선이어야 합니다."],
+        ["have a point", "일리가 있다", "You {have a point} there, but we also need to consider the budget.", "그 말도 일리가 있지만, 예산도 고려해야 해요."],
+        ["boil down to", "결국 ~로 귀결되다", "Ultimately, the decision {boils down to} cost versus reliability.", "결국 이 결정은 비용이냐 신뢰성이냐의 문제예요."],
+        ["weigh the pros and cons", "장단점을 따져 보다", "Let's {weigh the pros and cons} before making a final call.", "최종 결정을 내리기 전에 장단점을 따져 봅시다."],
+        ["I see where you're coming from", "무슨 말인지 알겠어요", "{I see where you're coming from}, but I'm not sure I agree.", "무슨 말씀인지는 알겠는데, 동의하기는 어렵네요."],
+        ["the way I see it", "내가 보기에는", "{The way I see it}, we don't have much of a choice.", "제가 보기엔 선택의 여지가 별로 없어요."],
+        ["That makes sense", "일리 있네요, 이해돼요", "{That makes sense}. I hadn't thought of it that way.", "말이 되네요. 그렇게는 생각 못 해 봤어요."],
+        ["I'm not sure about that", "그건 잘 모르겠어요 (완곡한 반대)", "Hmm, {I'm not sure about that}. Can we look at the numbers first?", "음, 그건 잘 모르겠어요. 수치부터 볼 수 있을까요?"],
+        ["on the other hand", "반면에", "It's cheaper. {On the other hand}, the quality isn't as good.", "더 싸긴 해요. 반면에 품질은 그만큼 좋지 않죠."],
+        ["It depends", "상황에 따라 달라요", "{It depends} on how much time we have.", "시간이 얼마나 있느냐에 따라 달라요."],
+        ["play devil's advocate", "일부러 반대 입장에 서 보다", "Let me {play devil's advocate} for a second.", "잠깐 일부러 반대 입장에서 말해 볼게요."],
+        ["at the end of the day", "결국에는", "{At the end of the day}, it's your decision.", "결국 결정은 당신 몫이에요."],
+        ["I couldn't agree more", "전적으로 동의해요", "{I couldn't agree more}. That's exactly what we need.", "전적으로 동의해요. 그게 바로 우리한테 필요한 거예요."],
+        ["agree to disagree", "서로 생각이 다름을 인정하다", "I guess we'll just have to {agree to disagree}.", "서로 생각이 다르다는 걸 인정해야겠네요."],
+        ["if you ask me", "내 생각엔", "{If you ask me}, it's not worth the risk.", "내 생각엔 그만한 위험을 감수할 가치가 없어."],
+        ["What's your take on", "~에 대해 어떻게 생각해요?", "{What's your take on} the new policy?", "새 정책에 대해 어떻게 생각하세요?"],
+        ["I'd say", "제 생각엔 ~인 것 같아요", "{I'd say} it's about a two-hour drive.", "제 생각엔 차로 두 시간쯤 걸릴 거예요."],
+        ["to be fair", "공정하게 말하자면", "{To be fair}, he did warn us about this.", "공정하게 말하면, 그가 이걸 미리 경고하긴 했어요."],
+        ["not necessarily", "꼭 그런 건 아니에요", "“Is the newest model the best?” “{Not necessarily}.”", "“최신 모델이 제일 좋은 거야?” “꼭 그렇진 않아.”"],
+        ["for what it's worth", "도움이 될지 모르겠지만", "{For what it's worth}, I think you made the right call.", "도움이 될지 모르겠지만, 난 네가 옳은 결정을 했다고 생각해."]
+      ],
+      life: [
+        ["work out", "운동하다", "I try to {work out} at least three times a week.", "일주일에 적어도 세 번은 운동하려고 해."],
+        ["come down with", "(병에) 걸리다", "I think I'm {coming down with} a cold.", "감기에 걸리려는 것 같아."],
+        ["make an appointment", "(병원 등을) 예약하다", "I need to {make an appointment} with the dentist.", "치과 예약을 해야 해."],
+        ["cut down on", "~을 줄이다", "I'm trying to {cut down on} caffeine.", "카페인을 줄이려고 노력 중이야."],
+        ["on a tight budget", "예산이 빠듯한", "We're {on a tight budget} this month.", "이번 달은 예산이 빠듯해."],
+        ["can't afford", "~할 여유가 없다", "I {can't afford} to eat out every day.", "매일 외식할 형편은 안 돼."],
+        ["worth it", "그만한 가치가 있는", "It was expensive, but totally {worth it}.", "비쌌지만 충분히 그만한 값을 했어."],
+        ["rip-off", "바가지", "Ten dollars for a coffee? What a {rip-off}!", "커피 한 잔에 10달러? 완전 바가지네!"],
+        ["run out of", "~이 다 떨어지다", "We've {run out of} milk. Can you pick some up?", "우유가 다 떨어졌어. 좀 사다 줄래?"],
+        ["pay off", "결실을 맺다", "All that hard work finally {paid off}.", "그 모든 노력이 드디어 결실을 맺었어."],
+        ["stay up late", "늦게까지 안 자다", "I {stayed up late} finishing the report.", "보고서 끝내느라 늦게까지 안 잤어."],
+        ["get in shape", "몸을 만들다", "I joined a gym to {get in shape} for the summer.", "여름 대비해서 몸 만들려고 헬스장에 등록했어."],
+        ["take a day off", "하루 쉬다", "I'm going to {take a day off} next Friday.", "다음 주 금요일에 하루 쉴 거야."],
+        ["act up", "말썽을 부리다", "My laptop has been {acting up} all morning.", "노트북이 아침 내내 말썽이야."],
+        ["drop off", "맡기다, 내려 주다", "I need to {drop off} my suit at the dry cleaner's.", "세탁소에 정장을 맡겨야 해."],
+        ["do the dishes", "설거지하다", "I'll cook if you {do the dishes}.", "네가 설거지하면 내가 요리할게."],
+        ["a good deal", "좋은 가격, 득템", "I got {a good deal} on this laptop.", "이 노트북 싸게 잘 샀어."],
+        ["treat yourself", "자신에게 선물하다", "You've worked hard. You should {treat yourself}.", "열심히 했잖아. 너 자신한테 선물 좀 해."],
+        ["save up", "돈을 모으다", "I'm {saving up} for a trip to Europe.", "유럽 여행 가려고 돈 모으는 중이야."],
+        ["get some rest", "좀 쉬다", "You look tired. Go home and {get some rest}.", "피곤해 보인다. 집에 가서 좀 쉬어."]
+      ],
+      drama: [
+        ["What's going on?", "무슨 일이야?", "{What's going on}? Why is everybody staring at me?", "무슨 일이야? 왜 다들 날 쳐다봐?"],
+        ["We need to talk", "우리 얘기 좀 해", "Do you have a minute? {We need to talk}.", "잠깐 시간 돼? 우리 얘기 좀 해."],
+        ["Here's the thing", "그게 말이야 (본론을 꺼낼 때)", "{Here's the thing}. I can't afford to lose this job.", "그게 말이야. 난 이 일자리를 잃으면 안 돼."],
+        ["long story short", "간단히 말하면", "{Long story short}, we missed the flight.", "간단히 말하면, 우리 비행기를 놓쳤어."],
+        ["I'm all ears", "잘 듣고 있어, 말해 봐", "Go ahead. {I'm all ears}.", "말해 봐. 잘 듣고 있어."],
+        ["Never mind", "됐어, 신경 쓰지 마", "{Never mind}. I'll do it myself.", "됐어. 내가 직접 할게."],
+        ["It's up to you", "네가 정해", "We can stay or leave. {It's up to you}.", "더 있어도 되고 가도 돼. 네가 정해."],
+        ["Just so you know", "참고로 말해 두는데", "{Just so you know}, I'm not mad at you.", "참고로 말해 두는데, 나 너한테 화난 거 아니야."],
+        ["I'm just saying", "그냥 그렇다는 거야", "Don't get upset. {I'm just saying} it's risky.", "화내지 마. 그냥 위험하다는 얘기야."],
+        ["You have no idea", "넌 상상도 못 할 거야", "{You have no idea} how much this means to me.", "이게 나한테 얼마나 큰 의미인지 넌 상상도 못 할 거야."],
+        ["Since when?", "언제부터?", "You're a vegetarian? {Since when}?", "네가 채식주의자라고? 언제부터?"],
+        ["How come?", "어째서?", "{How come} you never told me about this?", "어째서 나한테 이 얘기를 한 번도 안 했어?"],
+        ["I mean it", "진심이야", "Don't ever do that again. {I mean it}.", "다시는 그러지 마. 진심이야."],
+        ["give it a shot", "한번 해 보다", "I've never tried surfing, but I'll {give it a shot}.", "서핑은 한 번도 안 해 봤지만, 한번 해 볼게."],
+        ["You nailed it", "완벽하게 해냈어", "That presentation was perfect. {You nailed it}!", "발표 완벽했어. 제대로 해냈네!"],
+        ["Beats me", "나도 몰라", "“Why did he quit?” “{Beats me}.”", "“걔 왜 그만뒀대?” “나도 몰라.”"],
+        ["You got this", "넌 할 수 있어", "Take a deep breath. {You got this}.", "심호흡해. 넌 할 수 있어."],
+        ["out of the blue", "느닷없이", "She called me {out of the blue} after five years.", "그녀가 5년 만에 느닷없이 전화했어."],
+        ["Suit yourself", "좋을 대로 해", "You don't want to come? {Suit yourself}.", "안 오겠다고? 좋을 대로 해."],
+        ["It's a long story", "얘기하자면 길어", "“How did you two meet?” “{It's a long story}.”", "“둘이 어떻게 만났어?” “얘기하자면 길어.”"]
+      ],
+      conflict: [
+        ["Give me a break", "좀 봐줘, 작작 좀 해", "{Give me a break}. I've been working all day.", "좀 봐줘. 하루 종일 일했단 말이야."],
+        ["Cut it out", "그만해", "{Cut it out}, you two. I'm trying to focus.", "너희 둘 그만 좀 해. 나 집중하려는 중이야."],
+        ["none of your business", "네가 상관할 일이 아닌", "Who I date is {none of your business}.", "내가 누구랑 사귀든 네가 상관할 일이 아니야."],
+        ["That's not the point", "요점은 그게 아니야", "I know it's cheap, but {that's not the point}.", "싼 건 아는데, 요점은 그게 아니야."],
+        ["Don't get me wrong", "오해하지 마", "{Don't get me wrong}. I like him, but I don't trust him.", "오해하지 마. 그 사람 좋아하긴 하는데 믿지는 않아."],
+        ["hear someone out", "~의 말을 끝까지 듣다", "Please, just {hear me out} before you say no.", "제발, 거절하기 전에 내 말 좀 끝까지 들어 줘."],
+        ["screw up", "망치다, 실수하다", "I {screwed up}, and I'm really sorry.", "내가 망쳤어. 정말 미안해."],
+        ["It's not what it looks like", "보이는 그대로가 아니야", "Wait, {it's not what it looks like}.", "잠깐, 이건 네가 생각하는 그런 게 아니야."],
+        ["What's the big deal?", "그게 뭐 대수야?", "It's just one day late. {What's the big deal}?", "겨우 하루 늦은 거잖아. 그게 뭐 대수야?"],
+        ["stay out of it", "끼어들지 않다", "This is between me and him, so please {stay out of it}.", "이건 나랑 그 사람 사이의 일이니까 끼어들지 말아 줘."],
+        ["I've had enough", "더는 못 참아", "{I've had enough} of your excuses.", "네 변명은 이제 지긋지긋해."],
+        ["back off", "물러서다, 참견하지 않다", "{Back off}. I can handle this myself.", "참견 마. 이건 내가 알아서 할 수 있어."],
+        ["no offense", "기분 나쁘게 듣지는 마", "{No offense}, but that's a terrible idea.", "기분 나쁘게 듣지는 마, 근데 그건 정말 별로인 생각이야."],
+        ["What are you talking about?", "무슨 소리야?", "{What are you talking about}? I never said that.", "무슨 소리야? 난 그런 말 한 적 없어."],
+        ["let it go", "그냥 잊어버리다", "It happened years ago. Just {let it go}.", "몇 년 전 일이잖아. 그냥 잊어버려."],
+        ["cross the line", "선을 넘다", "You {crossed the line} when you read my messages.", "내 메시지를 읽은 건 선을 넘은 거야."],
+        ["take it out on", "~에게 화풀이하다", "I know you're upset, but don't {take it out on} me.", "속상한 건 알겠는데, 나한테 화풀이하지 마."],
+        ["make a scene", "소란을 피우다", "Please don't {make a scene}. Everyone's watching.", "제발 소란 피우지 마. 다들 보고 있어."],
+        ["I owe you an apology", "너한테 사과할 게 있어", "{I owe you an apology} for what I said last night.", "어젯밤에 내가 한 말, 사과할게."],
+        ["get it over with", "빨리 해치우다", "I hate these meetings. Let's just {get it over with}.", "이런 회의 정말 싫어. 그냥 빨리 끝내 버리자."]
+      ],
+      romance: [
+        ["have a crush on", "~를 짝사랑하다, ~에게 반하다", "I've {had a crush on} her since high school.", "고등학교 때부터 그녀를 좋아했어."],
+        ["ask someone out", "~에게 데이트 신청하다", "Just {ask her out}. What's the worst that could happen?", "그냥 데이트 신청해 봐. 최악이래 봤자 뭐겠어?"],
+        ["be seeing someone", "만나는 사람이 있다", "Are you {seeing anyone} these days?", "요즘 만나는 사람 있어?"],
+        ["hit it off", "죽이 잘 맞다", "We {hit it off} right away at the party.", "우린 파티에서 만나자마자 죽이 잘 맞았어."],
+        ["break up with", "~와 헤어지다", "She {broke up with} him over text.", "그녀는 문자로 그와 헤어졌어."],
+        ["stand someone up", "~를 바람맞히다", "I waited for an hour. I can't believe he {stood me up}.", "한 시간이나 기다렸어. 날 바람맞히다니 믿을 수가 없어."],
+        ["get along with", "~와 잘 지내다", "Do you {get along with} your in-laws?", "시댁(처가) 식구들이랑은 잘 지내?"],
+        ["make up", "화해하다", "They had a big fight, but they {made up} the next day.", "둘이 크게 싸웠는데 다음 날 화해했어."],
+        ["It's complicated", "사정이 복잡해", "“Are you two together?” “{It's complicated}.”", "“둘이 사귀는 거야?” “좀 복잡해.”"],
+        ["have someone's back", "~의 편이 되어 주다", "Don't worry. I've {got your back}.", "걱정 마. 내가 네 편이야."],
+        ["be there for", "~의 곁에 있어 주다", "Thanks for always {being there for} me.", "항상 내 곁에 있어 줘서 고마워."],
+        ["hit on", "~에게 작업 걸다", "Was that guy {hitting on} you at the bar?", "아까 바에서 그 남자가 너한테 작업 건 거야?"],
+        ["out of one's league", "넘볼 수 없는 상대인", "He's way {out of my league}.", "그 사람은 내가 넘볼 수 없는 상대야."],
+        ["cheat on", "~를 두고 바람피우다", "She found out he had been {cheating on} her.", "그녀는 그가 바람피우고 있었다는 걸 알게 됐어."],
+        ["move on", "털고 나아가다", "It's been a year. It's time to {move on}.", "벌써 1년이야. 이제 털고 나아갈 때야."],
+        ["set someone up with", "~에게 …를 소개해 주다", "My friend wants to {set me up with} her coworker.", "친구가 자기 직장 동료를 나한테 소개해 주고 싶대."],
+        ["fall for", "~에게 빠지다, 반하다", "I think I'm {falling for} him.", "나 그 사람한테 빠지고 있는 것 같아."],
+        ["drift apart", "사이가 멀어지다", "We just {drifted apart} after college.", "대학 졸업하고 그냥 사이가 멀어졌어."],
+        ["need some space", "혼자만의 시간이 필요하다", "I just {need some space} right now.", "지금은 그냥 혼자 있을 시간이 필요해."],
+        ["mean a lot to", "~에게 큰 의미가 있다", "Your support {means a lot to} me.", "네 응원이 나한테 정말 큰 힘이 돼."]
+      ],
+      crisis: [
+        ["I'm on it", "제가 바로 처리할게요", "“We need those files now.” “{I'm on it}.”", "“그 파일 지금 당장 필요해.” “바로 처리할게요.”"],
+        ["fill someone in", "~에게 상황을 알려 주다", "I just got here. Can someone {fill me in}?", "방금 왔는데, 누가 상황 좀 알려 줄래?"],
+        ["Something's off", "뭔가 이상해", "{Something's off}. He never leaves the door unlocked.", "뭔가 이상해. 그 사람은 절대 문을 안 잠그고 다니지 않거든."],
+        ["have a bad feeling about", "~에 대해 느낌이 안 좋다", "I {have a bad feeling about} this.", "이거 느낌이 안 좋아."],
+        ["What's the catch?", "무슨 조건(꿍꿍이)이 있는 거야?", "That sounds too good to be true. {What's the catch}?", "너무 좋은 얘기라 믿기지가 않는데. 무슨 조건이 있는 거야?"],
+        ["cover for", "~를 대신해 둘러대 주다", "If the boss asks, can you {cover for} me?", "사장님이 물어보면 나 대신 좀 둘러대 줄래?"],
+        ["I'll take care of it", "내가 처리할게", "Don't worry about the bill. {I'll take care of it}.", "계산은 걱정 마. 내가 처리할게."],
+        ["Stay with me", "정신 차려, 버텨", "{Stay with me}! The ambulance is almost here.", "정신 차려! 구급차가 거의 다 왔어."],
+        ["Calm down", "진정해", "{Calm down} and tell me exactly what happened.", "진정하고 무슨 일이 있었는지 정확히 말해 봐."],
+        ["get out of here", "여기서 나가다", "Grab your stuff. We need to {get out of here}.", "짐 챙겨. 여기서 나가야 해."],
+        ["Hold on a second", "잠깐만", "{Hold on a second}. Did you hear that?", "잠깐만. 방금 그 소리 들었어?"],
+        ["It's now or never", "지금 아니면 기회는 없어", "This is our only chance. {It's now or never}.", "이게 유일한 기회야. 지금 아니면 끝이야."],
+        ["in trouble", "곤경에 처한, 큰일 난", "If she finds out, we're {in big trouble}.", "그녀가 알게 되면 우린 큰일 나."],
+        ["figure out", "알아내다, 해결책을 찾다", "Give me some time. I'll {figure out} a way.", "시간을 좀 줘. 방법을 찾아볼게."],
+        ["keep an eye on", "~를 지켜보다", "Can you {keep an eye on} him while I make a call?", "나 전화하는 동안 저 사람 좀 지켜봐 줄래?"],
+        ["I can explain", "내가 설명할게", "Please don't be mad. {I can explain} everything.", "제발 화내지 마. 내가 다 설명할게."],
+        ["You're not going to believe this", "믿기 힘들겠지만", "{You're not going to believe this}, but I found the missing file.", "믿기 힘들겠지만, 없어진 파일을 찾았어."],
+        ["What's the plan?", "계획이 뭐야?", "Okay, we're in. So {what's the plan}?", "좋아, 우리도 할게. 그래서 계획이 뭐야?"],
+        ["Trust me on this", "이건 날 믿어", "{Trust me on this}. It's going to work.", "이건 날 믿어. 잘될 거야."],
+        ["run out of time", "시간이 다 되어 가다", "Hurry up! We're {running out of time}.", "서둘러! 시간이 없어."]
+      ]
+    };
+
+    /* ================================================================
+       2. 유틸 & 데이터 모델
+       ================================================================ */
+    const SET_SIZE = 10;
+    const STATE_KEY = "echodeck_state_v6";
+    const V5_CARDS_KEY = "echodeck_cards_v5";
+    const V5_SCRIPTS_KEY = "echodeck_scripts_v5";
+
+    const $ = id => document.getElementById(id);
+    const ESC_MAP = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+    const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, ch => ESC_MAP[ch]);
+    const escapeRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const stripMarks = s => String(s || "").replace(/[{}]/g, "");
+    const catLabel = key => (CATS.find(c => c.key === key) || CATS[0]).label;
+    const validCat = key => (CATS.some(c => c.key === key) ? key : CATS[0].key);
+
+    // 로컬 시간대 기준 날짜 (toISOString은 UTC라 한국 오전 9시 이전에 하루가 밀림)
+    function todayStr(offsetDays = 0) {
+      const d = new Date();
+      d.setDate(d.getDate() + offsetDays);
+      const p = n => String(n).padStart(2, "0");
+      return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+    }
+
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
       }
+      return arr;
+    }
 
-      const DEFAULT_SCRIPTS = [
-        {
-          id: "cat_business",
-          categoryKey: "business",
-          title: "💼 비즈니스·회의 핵심 표현 (4문장)",
-          youtubeId: "",
-          sentences: [
-            {
-              keyExpr: "on the same page",
-              en: "Let's make sure we're all on the same page before moving forward.",
-              ko: "다음 단계로 넘어가기 전에 우리 모두 의견이 일치하는지 확인합시다.",
-              start: null, end: null
-            },
-            {
-              keyExpr: "pull off",
-              en: "I didn't think she could pull off the presentation on such short notice.",
-              ko: "그렇게 촉박한 준비 기간에 그녀가 발표를 해낼 거라고는 생각하지 못했어요.",
-              start: null, end: null
-            },
-            {
-              keyExpr: "walk someone through",
-              en: "Could you walk me through the updated schedule step by step?",
-              ko: "업데이트된 일정을 단계별로 차근차근 설명해 주실 수 있나요?",
-              start: null, end: null
-            },
-            {
-              keyExpr: "circle back to",
-              en: "Let's circle back to that issue once we gather more data.",
-              ko: "데이터를 좀 더 모은 뒤에 그 문제로 다시 돌아와서 이야기하죠.",
-              start: null, end: null
-            }
-          ]
-        },
-        {
-          id: "cat_daily",
-          categoryKey: "daily",
-          title: "☕ 일상·스몰토크 필수 회화 (4문장)",
-          youtubeId: "",
-          sentences: [
-            {
-              keyExpr: "take a rain check",
-              en: "Something urgent came up at work, so I have to take a rain check.",
-              ko: "직장에 급한 일이 생겨서 다음 기회로 미뤄야 할 것 같아요.",
-              start: null, end: null
-            },
-            {
-              keyExpr: "get the hang of",
-              en: "It took me a while to get the hang of using the new system.",
-              ko: "새 시스템 사용 요령을 익히는 데 시간이 좀 걸렸어요.",
-              start: null, end: null
-            },
-            {
-              keyExpr: "beat yourself up",
-              en: "Don't beat yourself up over a minor mistake.",
-              ko: "사소한 실수 때문에 너무 자책하지 마세요.",
-              start: null, end: null
-            },
-            {
-              keyExpr: "call it a day",
-              en: "We've made great progress today, so let's call it a day.",
-              ko: "오늘 진전을 많이 이뤘으니 이만 마무리합시다.",
-              start: null, end: null
-            }
-          ]
-        },
-        {
-          id: "cat_travel",
-          categoryKey: "travel",
-          title: "✈️ 여행·식당·쇼핑 실전 표현 (4문장)",
-          youtubeId: "",
-          sentences: [
-            {
-              keyExpr: "under [Name]",
-              en: "Hi, I have a reservation under Kim and would like to check in.",
-              ko: "안녕하세요, 김(Kim) 이름으로 예약했는데 체크인하고 싶습니다.",
-              start: null, end: null
-            },
-            {
-              keyExpr: "grab a bite",
-              en: "Do you know any good places around here to grab a quick bite?",
-              ko: "이 근처에 간단히 요기할 만한 괜찮은 곳 아시나요?",
-              start: null, end: null
-            },
-            {
-              keyExpr: "try on",
-              en: "Excuse me, could I try this jacket on in a medium size?",
-              ko: "실례합니다, 이 재킷 미디엄 사이즈로 입어봐도 될까요?",
-              start: null, end: null
-            },
-            {
-              keyExpr: "split the bill",
-              en: "Could we split the bill, or is it easier to pay all together?",
-              ko: "계산을 따로 나눠서 할 수 있을까요, 아니면 한 번에 결제하는 게 편할까요?",
-              start: null, end: null
-            }
-          ]
-        },
-        {
-          id: "cat_email",
-          categoryKey: "email",
-          title: "📧 이메일·전화 응대 정중 표현 (4문장)",
-          youtubeId: "",
-          sentences: [
-            {
-              keyExpr: "get back to",
-              en: "Thank you for reaching out. I will get back to you by tomorrow afternoon.",
-              ko: "연락해 주셔서 감사합니다. 내일 오후까지 다시 회신드리겠습니다.",
-              start: null, end: null
-            },
-            {
-              keyExpr: "put someone through",
-              en: "Please hold on a moment while I put you through to the manager.",
-              ko: "담당 매니저분께 연결해 드릴 테니 잠시만 기다려 주세요.",
-              start: null, end: null
-            },
-            {
-              keyExpr: "touch base",
-              en: "I'm just writing to touch base regarding our upcoming project deadline.",
-              ko: "다가오는 프로젝트 마감일과 관련해 진행 상황을 확인차 연락드립니다.",
-              start: null, end: null
-            },
-            {
-              keyExpr: "keep someone posted",
-              en: "We are currently looking into the issue and will keep you posted.",
-              ko: "현재 해당 문제를 확인 중이며 진행 상황을 계속 공유해 드리겠습니다.",
-              start: null, end: null
-            }
-          ]
-        },
-        {
-          id: "cat_opinion",
-          categoryKey: "opinion",
-          title: "💬 의견 제시·토론 논리 표현 (4문장)",
-          youtubeId: "",
-          sentences: [
-            {
-              keyExpr: "from my perspective",
-              en: "From my perspective, focusing on user experience should be our top priority.",
-              ko: "제 관점에서는 사용자 경험에 집중하는 것이 최우선 과제가 되어야 합니다.",
-              start: null, end: null
-            },
-            {
-              keyExpr: "have a point",
-              en: "You have a point there, though we also need to consider the budget.",
-              ko: "그 말씀도 일리가 있지만, 예산 부분도 함께 고려해야 합니다.",
-              start: null, end: null
-            },
-            {
-              keyExpr: "boil down to",
-              en: "Ultimately, the decision boils down to cost versus reliability.",
-              ko: "궁극적으로 이 결정은 비용 대 신뢰성의 문제로 귀결됩니다.",
-              start: null, end: null
-            },
-            {
-              keyExpr: "weigh the pros and cons",
-              en: "Let's carefully weigh the pros and cons before making a final call.",
-              ko: "최종 결정을 내리기 전에 장단점을 신중하게 따져봅시다.",
-              start: null, end: null
-            }
-          ]
-        }
-      ];
+    function markExample(en, expr) {
+      if (!en) return "";
+      if (!expr) return en;
+      const m = en.match(new RegExp(escapeRe(expr), "i"));
+      if (!m) return en;
+      return en.slice(0, m.index) + "{" + m[0] + "}" + en.slice(m.index + m[0].length);
+    }
 
-      function todayStr(offsetDays = 0) {
-        const d = new Date();
-        d.setDate(d.getDate() + offsetDays);
-        return d.toISOString().slice(0, 10);
-      }
+    const hl = marked => esc(marked).replace(/\{(.+?)\}/, '<mark class="key">$1</mark>');
+    const keySpan = marked => { const m = marked.match(/\{(.+?)\}/); return m ? m[1] : ""; };
 
-      function buildDefaultCards() {
-        const raw = [
-          { id: "preset_b1", categoryKey: "business", expression: "on the same page", meaning: "같은 생각인, 의견·이해가 일치하는", ipa: "/ɒn ðə seɪm peɪdʒ/", example: "Let's make sure we're all on the same page before moving forward." },
-          { id: "preset_b2", categoryKey: "business", expression: "pull off", meaning: "(어려운 일을) 해내다, 성공시키다", ipa: "/pʊl ɒf/", example: "I didn't think she could pull off the presentation on such short notice." },
-          { id: "preset_b3", categoryKey: "business", expression: "walk someone through", meaning: "~에게 단계별로 차근차근 설명하다", ipa: "/wɔːk θruː/", example: "Could you walk me through the updated schedule step by step?" },
-          { id: "preset_b4", categoryKey: "business", expression: "circle back to", meaning: "(나중에) ~로 다시 돌아와 논의하다", ipa: "/ˈsɜːrkl bæk/", example: "Let's circle back to that issue once we gather more data." },
-          { id: "preset_d1", categoryKey: "daily", expression: "take a rain check", meaning: "다음 기회로 미루다", ipa: "/teɪk ə reɪn tʃek/", example: "Something urgent came up at work, so I have to take a rain check." },
-          { id: "preset_d2", categoryKey: "daily", expression: "get the hang of", meaning: "~의 요령을 익히다, 익숙해지다", ipa: "/ɡet ðə hæŋ ɒv/", example: "It took me a while to get the hang of using the new system." },
-          { id: "preset_d3", categoryKey: "daily", expression: "beat yourself up", meaning: "자책하다, 스스로를 괴롭히다", ipa: "/biːt jɔːrˈself ʌp/", example: "Don't beat yourself up over a minor mistake." },
-          { id: "preset_d4", categoryKey: "daily", expression: "call it a day", meaning: "오늘 일과를 마치다, 이만 마무리하다", ipa: "/kɔːl ɪt ə deɪ/", example: "We've made great progress today, so let's call it a day." },
-          { id: "preset_t1", categoryKey: "travel", expression: "under [Name]", meaning: "~의 이름으로 (예약된)", ipa: "/ˈʌndər/", example: "Hi, I have a reservation under Kim and would like to check in." },
-          { id: "preset_t2", categoryKey: "travel", expression: "grab a bite", meaning: "간단히 식사하다, 요기하다", ipa: "/ɡræb ə baɪt/", example: "Do you know any good places around here to grab a quick bite?" },
-          { id: "preset_t3", categoryKey: "travel", expression: "try on", meaning: "(옷·신발 등을) 입어보다, 신어보다", ipa: "/traɪ ɒn/", example: "Excuse me, could I try this jacket on in a medium size?" },
-          { id: "preset_t4", categoryKey: "travel", expression: "split the bill", meaning: "계산을 나누다, 더치페이하다", ipa: "/splɪt ðə bɪl/", example: "Could we split the bill, or is it easier to pay all together?" },
-          { id: "preset_e1", categoryKey: "email", expression: "get back to", meaning: "~에게 다시 연락하다, 회신하다", ipa: "/ɡet bæk tuː/", example: "Thank you for reaching out. I will get back to you by tomorrow afternoon." },
-          { id: "preset_e2", categoryKey: "email", expression: "put someone through", meaning: "(전화를) ~에게 연결해 주다", ipa: "/pʊt θruː/", example: "Please hold on a moment while I put you through to the manager." },
-          { id: "preset_e3", categoryKey: "email", expression: "touch base", meaning: "연락을 취하다, 상황을 확인하다", ipa: "/tʌtʃ beɪs/", example: "I'm just writing to touch base regarding our upcoming project deadline." },
-          { id: "preset_e4", categoryKey: "email", expression: "keep someone posted", meaning: "~에게 계속 소식·진행 상황을 알리다", ipa: "/kiːp ˈpoʊstɪd/", example: "We are currently looking into the issue and will keep you posted." },
-          { id: "preset_o1", categoryKey: "opinion", expression: "from my perspective", meaning: "제 관점에서는, 제가 보기에는", ipa: "/frɒm maɪ pərˈspektɪv/", example: "From my perspective, focusing on user experience should be our top priority." },
-          { id: "preset_o2", categoryKey: "opinion", expression: "have a point", meaning: "일리가 있다, 타당한 지적이다", ipa: "/hæv ə pɔɪnt/", example: "You have a point there, though we also need to consider the budget." },
-          { id: "preset_o3", categoryKey: "opinion", expression: "boil down to", meaning: "결국 ~로 귀결되다, 요약되다", ipa: "/bɔɪl daʊn tuː/", example: "Ultimately, the decision boils down to cost versus reliability." },
-          { id: "preset_o4", categoryKey: "opinion", expression: "weigh the pros and cons", meaning: "장단점을 따져보다", ipa: "/weɪ ðə proʊz ænd kɒnz/", example: "Let's carefully weigh the pros and cons before making a final call." }
-        ];
-        return raw.map(item => ({
-          ...item,
-          interval: 0,
-          repetitions: 0,
-          easeFactor: 2.5,
-          dueDate: todayStr()
-        }));
-      }
+    const PRESET_CARDS = [];
+    CATS.forEach(c => (PRESET[c.key] || []).forEach((r, i) => {
+      PRESET_CARDS.push({
+        id: `${c.key}_${i + 1}`, cat: c.key, n: i + 1,
+        expr: r[0], meaning: r[1], marked: r[2], en: stripMarks(r[2]), ko: r[3],
+        ipa: "", start: null, end: null, user: false
+      });
+    }));
+    // 새 표현은 카테고리를 번갈아 가며 소개
+    const PRESET_ORDERED = [...PRESET_CARDS].sort((a, b) => a.n - b.n);
 
-      function safeGetStorage(key) {
-        try { return localStorage.getItem(key); } catch { return null; }
-      }
-      function safeSetStorage(key, val) {
-        try { localStorage.setItem(key, val); } catch {}
-      }
+    function defaultState() {
+      return {
+        v: 6,
+        progress: {},
+        userCards: [],
+        yt: {},
+        log: {},
+        settings: { newPerDay: 10, rate: 1, voice: "", gap: true, hideEn: false, hideKo: false, repeat: 1 }
+      };
+    }
 
-      function loadCards() {
-        const defaults = buildDefaultCards();
-        const raw = safeGetStorage(STORAGE_KEY);
-        if (!raw) {
-          safeSetStorage(STORAGE_KEY, JSON.stringify(defaults));
-          return defaults;
-        }
-        try {
-          const parsed = JSON.parse(raw);
-          if (!Array.isArray(parsed) || parsed.length === 0) return defaults;
-          return parsed.map(c => ({ categoryKey: c.categoryKey || "business", ipa: "", ...c }));
-        } catch {
-          return defaults;
-        }
-      }
+    function safeGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+    function safeSet(key, val) { try { localStorage.setItem(key, val); } catch (e) {} }
 
-      function loadScripts() {
-        const raw = safeGetStorage(SCRIPTS_KEY);
-        if (!raw) {
-          safeSetStorage(SCRIPTS_KEY, JSON.stringify(DEFAULT_SCRIPTS));
-          return JSON.parse(JSON.stringify(DEFAULT_SCRIPTS));
-        }
-        try {
-          const parsed = JSON.parse(raw);
-          if (!Array.isArray(parsed) || parsed.length === 0) {
-            return JSON.parse(JSON.stringify(DEFAULT_SCRIPTS));
+    function normalizeState(raw) {
+      const st = defaultState();
+      if (!raw || typeof raw !== "object") return st;
+      if (raw.progress && typeof raw.progress === "object") st.progress = raw.progress;
+      if (Array.isArray(raw.userCards)) st.userCards = raw.userCards.filter(u => u && u.id);
+      if (raw.yt && typeof raw.yt === "object") st.yt = raw.yt;
+      if (raw.log && typeof raw.log === "object") st.log = raw.log;
+      if (raw.settings && typeof raw.settings === "object") Object.assign(st.settings, raw.settings);
+      return st;
+    }
+
+    // v5 데이터 이관: 직접 추가한 카드·문장·YouTube 연결·기본 표현의 복습 기록
+    function migrateV5(st, v5cards, v5scripts) {
+      let moved = 0;
+      const have = new Set(st.userCards.map(u => u.id));
+      const prog = c => ({
+        interval: c.interval || 0,
+        repetitions: c.repetitions || 0,
+        easeFactor: c.easeFactor || 2.5,
+        dueDate: c.dueDate || todayStr()
+      });
+      (Array.isArray(v5cards) ? v5cards : []).forEach(c => {
+        if (!c || !c.expression) return;
+        if (String(c.id).startsWith("preset_")) {
+          const match = PRESET_CARDS.find(p => p.expr.toLowerCase() === String(c.expression).toLowerCase())
+            || PRESET_CARDS.find(p => c.example && p.en.slice(0, 18) === String(c.example).slice(0, 18));
+          if (match && (c.repetitions > 0 || c.interval > 0) && !st.progress[match.id]) {
+            st.progress[match.id] = prog(c);
+            moved++;
           }
-          return parsed;
-        } catch {
-          return JSON.parse(JSON.stringify(DEFAULT_SCRIPTS));
-        }
-      }
-
-      let cards = loadCards();
-      let scripts = loadScripts();
-      let loopSentenceIdx = null;
-      let currentPlayingIdx = null;
-      let forceReviewAll = false;
-      let srsMode = "flip";
-      let selectedDeckCategoryKey = "all";
-      let selectedSrsCategoryKey = "all";
-      let dictAudioUrl = null;
-
-      // Lazy YouTube API Loader (only loads when YouTube ID is set)
-      let ytPlayer = null;
-      let ytApiLoading = false;
-      let ytApiReady = false;
-      let ytMonitorTimer = null;
-
-      function ensureYouTubeApi(callback) {
-        if (ytApiReady && window.YT && window.YT.Player) {
-          callback();
           return;
         }
-        window.onYouTubeIframeAPIReady = function() {
-          ytApiReady = true;
-          callback();
-        };
-        if (!ytApiLoading) {
-          ytApiLoading = true;
-          const tag = document.createElement("script");
-          tag.src = "https://www.youtube.com/iframe_api";
-          tag.onerror = () => showToast("YouTube API를 불러오지 못했습니다. TTS 모드로 동작합니다.");
-          document.head.appendChild(tag);
-        }
-      }
-
-      function saveCards(list) {
-        safeSetStorage(STORAGE_KEY, JSON.stringify(list));
-        updateStats();
-      }
-
-      function saveScripts(list) {
-        safeSetStorage(SCRIPTS_KEY, JSON.stringify(list));
-      }
-
-      function showToast(msg) {
-        const el = document.getElementById("toast");
-        el.textContent = msg;
-        el.classList.add("show");
-        clearTimeout(el._t);
-        el._t = setTimeout(() => el.classList.remove("show"), 2300);
-      }
-
-      function updateStats() {
-        const today = todayStr();
-        const dueCount = cards.filter(c => c.dueDate <= today).length;
-        document.getElementById("dueCountBadge").textContent = dueCount;
-        document.getElementById("totalCountBadge").textContent = cards.length;
-      }
-
-      function getCurrentScript() {
-        const sel = document.getElementById("scriptSelect");
-        return scripts.find(s => s.id === sel.value) || scripts[0];
-      }
-
-      function extractYouTubeId(input) {
-        const trimmed = (input || "").trim();
-        if (!trimmed) return "";
-        if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return trimmed;
-        const m = trimmed.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([a-zA-Z0-9_-]{11})/);
-        return m ? m[1] : "";
-      }
-
-      function syncYouTubePlayerForCurrentScript() {
-        const script = getCurrentScript();
-        const box = document.getElementById("ytPlayerBox");
-        document.getElementById("ytUrlInput").value = script.youtubeId || "";
-
-        if (!script.youtubeId) {
-          box.classList.remove("visible");
-          stopAllPlayback(false);
-          return;
-        }
-
-        box.classList.add("visible");
-        ensureYouTubeApi(() => {
-          const playerVars = { playsinline: 1, rel: 0, modestbranding: 1 };
-          if (window.location.origin && window.location.origin.startsWith("http")) {
-            playerVars.origin = window.location.origin;
-          }
-          if (!ytPlayer) {
-            ytPlayer = new YT.Player("ytPlayerContainer", {
-              videoId: script.youtubeId,
-              playerVars,
-              events: {
-                onReady: () => {
-                  document.getElementById("ytStatusText").textContent = `연결됨: ${script.youtubeId}`;
-                }
-              }
-            });
-          } else if (ytPlayer.cueVideoById) {
-            ytPlayer.cueVideoById(script.youtubeId);
-            document.getElementById("ytStatusText").textContent = `연결됨: ${script.youtubeId}`;
-          }
+        if (have.has(c.id)) return;
+        have.add(c.id);
+        st.userCards.push({
+          id: String(c.id), cat: validCat(c.categoryKey), expr: c.expression, meaning: c.meaning || "",
+          en: stripMarks(c.example), ko: "", ipa: c.ipa || "", start: null, end: null
         });
-      }
-
-      function populateCategorySelects() {
-        const optionsHtml = CATEGORY_META.filter(c => c.key !== "all")
-          .map(c => `<option value="${c.key}">${c.label}</option>`)
-          .join("");
-        document.getElementById("qwCategory").innerHTML = optionsHtml;
-        document.getElementById("addCategory").innerHTML = optionsHtml;
-      }
-
-      function renderShadowingChips() {
-        const container = document.getElementById("shadowingCategoryChips");
-        const currentScript = getCurrentScript();
-        container.innerHTML = scripts.map(s => `
-          <button type="button" class="chip ${s.id === currentScript.id ? "active" : ""}" data-sid="${s.id}">
-            ${getCategoryLabel(s.categoryKey)}
-          </button>
-        `).join("");
-        container.querySelectorAll(".chip").forEach(btn => {
-          btn.addEventListener("click", () => {
-            document.getElementById("scriptSelect").value = btn.dataset.sid;
-            stopAllPlayback(false);
-            syncYouTubePlayerForCurrentScript();
-            renderShadowingChips();
-            renderSentences();
+        if (c.repetitions > 0 || c.interval > 0) st.progress[c.id] = prog(c);
+        moved++;
+      });
+      (Array.isArray(v5scripts) ? v5scripts : []).forEach((s, si) => {
+        if (!s) return;
+        const cat = validCat(s.categoryKey);
+        if (s.youtubeId && !st.yt[cat]) st.yt[cat] = s.youtubeId;
+        (s.sentences || []).forEach((sen, i) => {
+          if (!sen || sen.keyExpr || !sen.en) return;
+          const id = `s5_${si}_${i}`;
+          if (have.has(id)) return;
+          have.add(id);
+          st.userCards.push({
+            id, cat, expr: "", meaning: "", en: stripMarks(sen.en), ko: sen.ko || "", ipa: "",
+            start: typeof sen.start === "number" ? sen.start : null,
+            end: typeof sen.end === "number" ? sen.end : null
           });
+          moved++;
         });
+      });
+      return moved;
+    }
+
+    function loadState() {
+      const raw = safeGet(STATE_KEY);
+      if (raw) {
+        try { return normalizeState(JSON.parse(raw)); } catch (e) {}
       }
+      const st = defaultState();
+      try {
+        const c5 = JSON.parse(safeGet(V5_CARDS_KEY) || "null");
+        const s5 = JSON.parse(safeGet(V5_SCRIPTS_KEY) || "null");
+        if (c5 || s5) migrateV5(st, c5, s5);
+      } catch (e) {}
+      safeSet(STATE_KEY, JSON.stringify(st));
+      return st;
+    }
 
-      function renderCategoryChips(containerId, activeKey, onSelect) {
-        const el = document.getElementById(containerId);
-        el.innerHTML = CATEGORY_META.map(cat => {
-          const count = cat.key === "all"
-            ? cards.length
-            : cards.filter(c => c.categoryKey === cat.key).length;
-          return `<button type="button" class="chip ${activeKey === cat.key ? "active" : ""}" data-key="${cat.key}">${cat.label} (${count})</button>`;
-        }).join("");
-        el.querySelectorAll(".chip").forEach(btn => {
-          btn.addEventListener("click", () => {
-            const chosen = btn.dataset.key;
-            renderCategoryChips(containerId, chosen, onSelect);
-            onSelect(chosen);
-          });
-        });
-      }
+    let state = loadState();
+    function save() { safeSet(STATE_KEY, JSON.stringify(state)); }
 
-      function stopAllPlayback(rerender = true) {
-        loopSentenceIdx = null;
-        currentPlayingIdx = null;
-        clearInterval(ytMonitorTimer);
-        if ("speechSynthesis" in window) {
-          try { window.speechSynthesis.cancel(); } catch {}
-        }
-        if (ytPlayer && ytPlayer.pauseVideo) {
-          try { ytPlayer.pauseVideo(); } catch {}
-        }
-        if (rerender) renderSentences();
-      }
-
-      function speakTTS(text, onEndCallback = null) {
-        if (!("speechSynthesis" in window)) {
-          showToast("이 브라우저는 음성 합성을 지원하지 않습니다.");
-          return;
-        }
-        window.speechSynthesis.cancel();
-        const utter = new SpeechSynthesisUtterance(text);
-        utter.lang = "en-US";
-        utter.rate = parseFloat(document.getElementById("rateSelect").value || "1");
-        if (onEndCallback) utter.onend = onEndCallback;
-        window.speechSynthesis.speak(utter);
-      }
-
-      function playSentenceSegment(idx, isLoop) {
-        const script = getCurrentScript();
-        const item = script.sentences[idx];
-        const rate = parseFloat(document.getElementById("rateSelect").value || "1");
-
-        clearInterval(ytMonitorTimer);
-        if ("speechSynthesis" in window) window.speechSynthesis.cancel();
-
-        currentPlayingIdx = idx;
-        renderSentences();
-
-        const hasYtSegment = script.youtubeId && ytPlayer && ytPlayer.seekTo && typeof item.start === "number" && typeof item.end === "number" && item.end > item.start;
-
-        if (hasYtSegment) {
-          ytPlayer.setPlaybackRate(rate);
-          ytPlayer.seekTo(item.start, true);
-          ytPlayer.playVideo();
-          document.getElementById("ytStatusText").textContent = `구간 재생: ${item.start}s ~ ${item.end}s`;
-
-          ytMonitorTimer = setInterval(() => {
-            if (!ytPlayer || !ytPlayer.getCurrentTime) return;
-            const now = ytPlayer.getCurrentTime();
-            if (now >= item.end) {
-              if (isLoop && loopSentenceIdx === idx) {
-                ytPlayer.seekTo(item.start, true);
-              } else {
-                clearInterval(ytMonitorTimer);
-                ytPlayer.pauseVideo();
-                currentPlayingIdx = null;
-                renderSentences();
-              }
-            }
-          }, 120);
-        } else {
-          const runTts = () => {
-            speakTTS(item.en, () => {
-              if (isLoop && loopSentenceIdx === idx) {
-                setTimeout(runTts, 600);
-              } else {
-                currentPlayingIdx = null;
-                renderSentences();
-              }
-            });
-          };
-          runTts();
-        }
-      }
-
-      window.playSingle = function(idx) {
-        loopSentenceIdx = null;
-        playSentenceSegment(idx, false);
-      };
-
-      window.toggleLoop = function(idx) {
-        if (loopSentenceIdx === idx) {
-          stopAllPlayback(true);
-          return;
-        }
-        loopSentenceIdx = idx;
-        playSentenceSegment(idx, true);
-      };
-
-      window.checkPronunciation = function(idx) {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        const resultEl = document.getElementById(`stt-${idx}`);
-        if (!SpeechRecognition) {
-          showToast("현재 브라우저에서는 음성 인식이 제한됩니다. 쉐도잉 듣기 반복을 활용해주세요.");
-          return;
-        }
-        const target = getCurrentScript().sentences[idx].en;
-        const rec = new SpeechRecognition();
-        rec.lang = "en-US";
-        rec.interimResults = false;
-        resultEl.style.display = "block";
-        resultEl.textContent = "🎙️ 듣고 있습니다... 문장을 또박또박 읽어주세요.";
-
-        rec.onresult = (e) => {
-          const spoken = e.results[0][0].transcript;
-          resultEl.innerHTML = `<strong>인식 발화:</strong> "${spoken}"<br><span style="color:var(--muted);">원문 대조: "${target}"</span>`;
-        };
-        rec.onerror = () => {
-          resultEl.textContent = "음성을 인식하지 못했습니다. 마이크 권한을 확인해주세요.";
-        };
-        rec.start();
-      };
-
-      window.speakTextGlobal = function(text) {
-        speakTTS(text);
-      };
-
-      function initScriptSelect() {
-        const sel = document.getElementById("scriptSelect");
-        sel.innerHTML = scripts.map(s => `<option value="${s.id}">${s.title}</option>`).join("");
-      }
-
-      function tokenizeSentence(sentence, sIdx) {
-        return sentence.split(" ").map(word => {
-          const clean = word.replace(/^[^a-zA-Z'-]+|[^a-zA-Z'-]+$/g, "");
-          return `<span class="word-token" data-word="${encodeURIComponent(clean)}" data-sidx="${sIdx}">${word}</span>`;
-        }).join(" ");
-      }
-
-      function renderSentences() {
-        const script = getCurrentScript();
-        const container = document.getElementById("sentenceList");
-
-        container.innerHTML = script.sentences.map((item, idx) => {
-          const isPlaying = currentPlayingIdx === idx;
-          const isLooping = loopSentenceIdx === idx;
-          const hasTiming = typeof item.start === "number" && typeof item.end === "number";
-          return `
-            <div class="sentence-item ${isPlaying ? "playing" : ""}">
-              ${item.keyExpr ? `<div class="key-expr-tag">핵심 표현: ${item.keyExpr}</div>` : ""}
-              <div class="en-line">
-                ${hasTiming ? `<span class="time-chip">${item.start}s–${item.end}s</span>` : ""}
-                ${tokenizeSentence(item.en, idx)}
-              </div>
-              <div class="ko-line">${item.ko}</div>
-              <div class="sentence-actions">
-                <button type="button" class="sm primary" onclick="playSingle(${idx})">▶ 듣기</button>
-                <button type="button" class="sm ${isLooping ? "accent" : ""}" onclick="toggleLoop(${idx})">${isLooping ? "🔁 반복 중" : "🔁 구간 반복"}</button>
-                <button type="button" class="sm" onclick="checkPronunciation(${idx})">🎙️ 따라 말하기</button>
-              </div>
-              <div class="stt-result" id="stt-${idx}"></div>
-            </div>
-          `;
-        }).join("");
-
-        container.querySelectorAll(".word-token").forEach(span => {
-          span.addEventListener("click", () => {
-            const word = decodeURIComponent(span.dataset.word);
-            const sIdx = parseInt(span.dataset.sidx, 10);
-            if (!word) return;
-            openQuickWord(word, script.sentences[sIdx].en, script.categoryKey || "business");
-          });
-        });
-      }
-
-      async function fetchDictionaryInfo(word) {
-        const previewEl = document.getElementById("dictPreview");
-        const ipaInput = document.getElementById("qwIpa");
-        dictAudioUrl = null;
-        previewEl.textContent = `"${word}" 사전 데이터 조회 중...`;
-
-        try {
-          const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word.toLowerCase())}`);
-          if (!res.ok) throw new Error("Not found");
-          const data = await res.json();
-          const entry = data[0];
-          const phonetic = entry.phonetic || (entry.phonetics?.find(p => p.text)?.text) || "";
-          const audioObj = entry.phonetics?.find(p => p.audio && p.audio.length > 0);
-          if (audioObj) dictAudioUrl = audioObj.audio;
-          if (phonetic) ipaInput.value = phonetic;
-
-          const firstMeaning = entry.meanings?.[0];
-          const pos = firstMeaning?.partOfSpeech || "";
-          const def = firstMeaning?.definitions?.[0]?.definition || "";
-          previewEl.innerHTML = `<strong>${entry.word}</strong> ${phonetic ? `<span style="color:var(--primary);">${phonetic}</span>` : ""} ${pos ? `<em>(${pos})</em>` : ""}<br>${def}`;
-        } catch {
-          previewEl.textContent = `영영 사전 항목을 찾지 못했습니다. 한국어 뜻을 직접 입력해 저장하세요.`;
-        }
-      }
-
-      function openQuickWord(word, example, defaultCategoryKey) {
-        const box = document.getElementById("quickWordBox");
-        document.getElementById("qwExpr").value = word;
-        document.getElementById("qwMeaning").value = "";
-        document.getElementById("qwIpa").value = "";
-        document.getElementById("qwExample").value = example;
-        document.getElementById("qwCategory").value = defaultCategoryKey || "business";
-        box.classList.add("open");
-        document.getElementById("qwMeaning").focus();
-        fetchDictionaryInfo(word);
-      }
-
-      function calculateSM2(card, quality) {
-        let { interval, repetitions, easeFactor } = card;
-        if (quality === 1) {
-          repetitions = 0;
-          interval = 0;
-        } else {
-          if (repetitions === 0) interval = 1;
-          else if (repetitions === 1) interval = 3;
-          else interval = Math.round(interval * easeFactor);
-
-          if (quality === 2) interval = Math.max(1, Math.round(interval * 0.8));
-          if (quality === 4) interval = Math.round(interval * 1.3) + 1;
-          repetitions += 1;
-        }
-        easeFactor = Math.max(1.3, easeFactor + (0.1 - (4 - quality) * (0.08 + (4 - quality) * 0.02)));
+    function userUnified() {
+      return state.userCards.map(u => {
+        const en = u.en || u.expr || "";
         return {
-          ...card,
-          interval,
-          repetitions,
-          easeFactor: Number(easeFactor.toFixed(2)),
-          dueDate: todayStr(interval)
+          id: u.id, cat: validCat(u.cat), n: 0,
+          expr: u.expr || "", meaning: u.meaning || "",
+          marked: markExample(en, u.expr), en, ko: u.ko || "", ipa: u.ipa || "",
+          start: typeof u.start === "number" ? u.start : null,
+          end: typeof u.end === "number" ? u.end : null,
+          user: true
         };
-      }
+      });
+    }
+    const allCards = () => [...userUnified(), ...PRESET_CARDS];
+    const cardById = id => allCards().find(c => c.id === id);
 
-      function buildClozeSentence(example, expression) {
-        if (!example) return `뜻: [ __________ ]`;
-        const escaped = expression.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-        const regex = new RegExp(escaped, "i");
-        if (regex.test(example)) {
-          return example.replace(regex, `<span style="color:var(--primary); font-weight:800;">[ ______ ]</span>`);
-        }
-        return `${example} <br><span style="color:var(--primary); font-weight:800;">[ ______ ]</span>`;
-      }
+    function cardStatus(id) {
+      const p = state.progress[id];
+      if (!p) return "new";
+      return p.interval >= 21 ? "mastered" : "learning";
+    }
 
-      function renderSRS() {
-        const container = document.getElementById("srsContainer");
-        const today = todayStr();
-        const byCat = selectedSrsCategoryKey === "all"
-          ? cards
-          : cards.filter(c => c.categoryKey === selectedSrsCategoryKey);
-        const queue = forceReviewAll ? [...byCat] : byCat.filter(c => c.dueDate <= today);
+    function todayLog() {
+      const t = todayStr();
+      if (!state.log[t]) state.log[t] = { r: 0, n: 0, x: 0 };
+      return state.log[t];
+    }
+    function newQuotaLeft() {
+      const l = state.log[todayStr()] || { r: 0, n: 0, x: 0 };
+      return Math.max(0, state.settings.newPerDay + (l.x || 0) - (l.n || 0));
+    }
+    function calcStreak() {
+      let n = 0;
+      let off = (state.log[todayStr()] && state.log[todayStr()].r > 0) ? 0 : -1;
+      while (state.log[todayStr(off)] && state.log[todayStr(off)].r > 0) { n++; off--; }
+      return n;
+    }
 
-        if (queue.length === 0) {
-          forceReviewAll = false;
-          container.innerHTML = `
-            <div style="text-align:center; padding:36px 12px;">
-              <div style="font-size:1.12rem; font-weight:700; margin-bottom:6px;">선택한 카테고리의 오늘 복습 카드를 모두 완료했습니다!</div>
-              <p style="color:var(--muted); font-size:0.88rem;">상단 '전체 연습'을 누르면 예정일과 무관하게 다시 복습할 수 있습니다.</p>
-            </div>
-          `;
-          return;
-        }
+    function showToast(msg) {
+      const el = $("toast");
+      el.textContent = msg;
+      el.classList.add("show");
+      clearTimeout(el._t);
+      el._t = setTimeout(() => el.classList.remove("show"), 2400);
+    }
 
-        const current = queue[0];
+    function updateStats() {
+      const today = todayStr();
+      const cards = allCards();
+      const due = cards.filter(c => state.progress[c.id] && state.progress[c.id].dueDate <= today).length;
+      const unseen = cards.filter(c => !state.progress[c.id]).length;
+      $("dueCountBadge").textContent = due;
+      $("newCountBadge").textContent = Math.min(newQuotaLeft(), unseen);
+      $("streakBadge").textContent = calcStreak();
+    }
 
-        if (srsMode === "cloze") {
-          const masked = buildClozeSentence(current.example, current.expression);
-          container.innerHTML = `
-            <div style="font-size:0.82rem; color:var(--muted); margin-bottom:10px;">남은 카드: <strong>${queue.length}</strong>개 · 빈칸 채우기 모드</div>
-            <div class="flashcard">
-              <div class="fc-cat">${getCategoryLabel(current.categoryKey)}</div>
-              <div style="font-size:0.95rem; font-weight:700; color:var(--accent); margin-bottom:8px;">뜻: ${current.meaning}</div>
-              <div class="fc-example">"${masked}"</div>
-              <div class="cloze-input-wrap">
-                <input type="text" id="clozeGuessInput" placeholder="빈칸에 들어갈 영어 표현 입력" autocomplete="off" />
-                <button type="button" class="primary sm" id="checkClozeBtn">확인</button>
-              </div>
-              <div id="clozeFeedback" style="font-size:0.85rem; margin-bottom:8px;"></div>
-              <div class="fc-answer" id="fcAnswerBox">
-                <div class="fc-word" style="font-size:1.35rem;">${current.expression}</div>
-                <div class="fc-ipa">${current.ipa || ""}</div>
-                <div class="srs-buttons">
-                  <button type="button" class="srs-btn srs-again" onclick="gradeCard('${current.id}', 1)">Again<small>오늘 다시</small></button>
-                  <button type="button" class="srs-btn srs-hard" onclick="gradeCard('${current.id}', 2)">Hard<small>짧게</small></button>
-                  <button type="button" class="srs-btn srs-good" onclick="gradeCard('${current.id}', 3)">Good<small>표준 간격</small></button>
-                  <button type="button" class="srs-btn srs-easy" onclick="gradeCard('${current.id}', 4)">Easy<small>길게</small></button>
-                </div>
-              </div>
-            </div>
-          `;
-
-          const checkFn = () => {
-            const guess = document.getElementById("clozeGuessInput").value.trim().toLowerCase();
-            const ans = current.expression.trim().toLowerCase();
-            const fb = document.getElementById("clozeFeedback");
-            if (guess === ans) {
-              fb.innerHTML = `<span style="color:var(--success); font-weight:700;">정답입니다!</span>`;
-            } else {
-              fb.innerHTML = `<span style="color:var(--danger); font-weight:700;">입력: "${guess || "(공백)"}"</span> → 정답을 확인하세요.`;
-            }
-            document.getElementById("fcAnswerBox").classList.add("visible");
-            speakTTS(current.expression);
-          };
-          document.getElementById("checkClozeBtn").addEventListener("click", checkFn);
-          document.getElementById("clozeGuessInput").addEventListener("keydown", e => {
-            if (e.key === "Enter") checkFn();
-          });
-        } else {
-          container.innerHTML = `
-            <div style="font-size:0.82rem; color:var(--muted); margin-bottom:10px;">남은 카드: <strong>${queue.length}</strong>개 · 플래시카드 모드</div>
-            <div class="flashcard">
-              <div class="fc-cat">${getCategoryLabel(current.categoryKey)}</div>
-              <div class="fc-word">${current.expression}</div>
-              <div class="fc-ipa">${current.ipa || ""}</div>
-              <div class="fc-example">"${current.example || ""}"</div>
-              <div style="display:flex; gap:8px;">
-                <button type="button" class="sm" onclick="speakCurrentCard()">🔊 발음 듣기</button>
-                <button type="button" class="sm primary" id="revealAnswerBtn">정답 및 뜻 확인</button>
-              </div>
-              <div class="fc-answer" id="fcAnswerBox">
-                <div class="fc-meaning">${current.meaning}</div>
-                <div style="font-size:0.78rem; color:var(--muted);">복습 간격: ${current.interval}일 · 난이도 계수: ${current.easeFactor}</div>
-                <div class="srs-buttons">
-                  <button type="button" class="srs-btn srs-again" onclick="gradeCard('${current.id}', 1)">Again<small>오늘 다시</small></button>
-                  <button type="button" class="srs-btn srs-hard" onclick="gradeCard('${current.id}', 2)">Hard<small>짧게</small></button>
-                  <button type="button" class="srs-btn srs-good" onclick="gradeCard('${current.id}', 3)">Good<small>표준 간격</small></button>
-                  <button type="button" class="srs-btn srs-easy" onclick="gradeCard('${current.id}', 4)">Easy<small>길게</small></button>
-                </div>
-              </div>
-            </div>
-          `;
-          document.getElementById("revealAnswerBtn").addEventListener("click", () => {
-            document.getElementById("fcAnswerBox").classList.add("visible");
-            document.getElementById("revealAnswerBtn").style.display = "none";
-          });
-        }
-
-        window.speakCurrentCard = () => speakTTS(`${current.expression}. ${current.example || ""}`);
-      }
-
-      window.gradeCard = function(id, quality) {
-        cards = cards.map(c => c.id === id ? calculateSM2(c, quality) : c);
-        saveCards(cards);
-        if (forceReviewAll) {
-          const idx = cards.findIndex(c => c.id === id);
-          const [moved] = cards.splice(idx, 1);
-          cards.push(moved);
-        }
-        renderCategoryChips("srsCategoryChips", selectedSrsCategoryKey, key => {
-          selectedSrsCategoryKey = key;
-          renderSRS();
-        });
-        renderSRS();
+    function renderChips(containerId, items, activeKey, onSelect) {
+      const el = $(containerId);
+      el.innerHTML = items.map(it =>
+        `<button type="button" class="chip ${it.key === activeKey ? "active" : ""}" data-key="${esc(it.key)}">${esc(it.label)}</button>`
+      ).join("");
+      el.onclick = e => {
+        const btn = e.target.closest(".chip");
+        if (btn) onSelect(btn.dataset.key);
       };
+    }
 
-      function addNewCard(expression, meaning, example, ipa = "", categoryKey = "business") {
-        cards.unshift({
-          id: "c_" + Date.now(),
-          categoryKey,
-          expression,
-          meaning,
-          ipa,
-          example,
-          interval: 0,
-          repetitions: 0,
-          easeFactor: 2.5,
-          dueDate: todayStr()
-        });
-        saveCards(cards);
-        renderCategoryChips("deckCategoryChips", selectedDeckCategoryKey, key => {
-          selectedDeckCategoryKey = key;
-          renderDeck();
-        });
-        renderDeck();
+    function catChipItems(withAll) {
+      const cards = allCards();
+      const items = CATS.map(c => ({ key: c.key, label: `${c.label} (${cards.filter(x => x.cat === c.key).length})` }));
+      if (withAll) items.unshift({ key: "all", label: `전체 (${cards.length})` });
+      return items;
+    }
+
+    /* ================================================================
+       3. 음성 (TTS)
+       ================================================================ */
+    let voices = [];
+    let speakTok = 0;
+
+    function scoreVoice(v) {
+      let s = 0;
+      const lang = v.lang.replace("_", "-");
+      if (/natural|neural|premium|enhanced/i.test(v.name)) s += 3;
+      if (/Google US English|Samantha|Aria|Jenny|Ava|Evan|Allison/i.test(v.name)) s += 2;
+      if (lang === "en-US") s += 2;
+      return s;
+    }
+    function pickVoice() {
+      if (!voices.length) return null;
+      const saved = voices.find(v => v.voiceURI === state.settings.voice);
+      if (saved) return saved;
+      return [...voices].sort((a, b) => scoreVoice(b) - scoreVoice(a))[0];
+    }
+    function loadVoices() {
+      if (!("speechSynthesis" in window)) return;
+      voices = window.speechSynthesis.getVoices().filter(v => /^en[-_]/i.test(v.lang));
+      const sel = $("voiceSelect");
+      if (!voices.length) { sel.innerHTML = `<option value="">기본</option>`; return; }
+      const cur = pickVoice();
+      sel.innerHTML = voices.map(v =>
+        `<option value="${esc(v.voiceURI)}" ${cur && v.voiceURI === cur.voiceURI ? "selected" : ""}>${esc(v.name.replace(/Microsoft |Google /, ""))} (${esc(v.lang.replace("_", "-"))})</option>`
+      ).join("");
+    }
+
+    function speak(text, cb) {
+      if (!("speechSynthesis" in window)) {
+        showToast("이 브라우저는 음성 합성을 지원하지 않습니다.");
+        return;
       }
-
-      function renderDeck() {
-        const q = document.getElementById("deckSearchInput").value.trim().toLowerCase();
-        const filtered = cards.filter(c => {
-          const matchCat = selectedDeckCategoryKey === "all" || c.categoryKey === selectedDeckCategoryKey;
-          const matchQuery =
-            c.expression.toLowerCase().includes(q) ||
-            c.meaning.toLowerCase().includes(q) ||
-            (c.example || "").toLowerCase().includes(q);
-          return matchCat && matchQuery;
-        });
-        const today = todayStr();
-        const container = document.getElementById("deckList");
-
-        if (filtered.length === 0) {
-          container.innerHTML = `<p style="color:var(--muted); font-size:0.9rem;">표시할 표현이 없습니다.</p>`;
-          return;
-        }
-
-        container.innerHTML = filtered.map(c => {
-          const isDue = c.dueDate <= today;
-          return `
-            <div class="deck-item">
-              <div>
-                <div style="font-weight:700; font-size:1rem;">
-                  ${c.expression}
-                  ${c.ipa ? `<span style="font-weight:400; color:var(--muted); font-size:0.84rem;">${c.ipa}</span>` : ""}
-                  <span class="badge cat">${getCategoryLabel(c.categoryKey)}</span>
-                  <span class="badge ${isDue ? "due" : ""}">${isDue ? "오늘 복습" : `다음: ${c.dueDate}`}</span>
-                </div>
-                <div style="font-size:0.9rem; color:#334155; margin-top:2px;">${c.meaning}</div>
-                ${c.example ? `<div style="font-size:0.82rem; color:var(--muted); margin-top:3px;">"${c.example}"</div>` : ""}
-              </div>
-              <div style="display:flex; gap:6px; flex-shrink:0;">
-                <button type="button" class="sm" onclick="speakTextGlobal('${c.expression.replace(/'/g, "\\'")}')">🔊</button>
-                <button type="button" class="sm danger" onclick="deleteCard('${c.id}')">삭제</button>
-              </div>
-            </div>
-          `;
-        }).join("");
-      }
-
-      window.deleteCard = function(id) {
-        cards = cards.filter(c => c.id !== id);
-        saveCards(cards);
-        renderCategoryChips("deckCategoryChips", selectedDeckCategoryKey, key => {
-          selectedDeckCategoryKey = key;
-          renderDeck();
-        });
-        renderDeck();
-        showToast("삭제되었습니다.");
+      const tok = ++speakTok;
+      try { window.speechSynthesis.cancel(); } catch (e) {}
+      const u = new SpeechSynthesisUtterance(text);
+      const v = pickVoice();
+      if (v) { u.voice = v; u.lang = v.lang.replace("_", "-"); } else { u.lang = "en-US"; }
+      u.rate = Number(state.settings.rate) || 1;
+      u.onend = u.onerror = () => {
+        if (tok === speakTok && cb) { const f = cb; cb = null; f(); }
       };
+      window.speechSynthesis.speak(u);
+    }
 
-      // Bind All Events
-      document.querySelectorAll(".tab-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-          document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-          btn.classList.add("active");
-          const tab = btn.dataset.tab;
-          document.getElementById(`view-${tab}`).classList.add("active");
-          if (tab === "srs") {
-            renderCategoryChips("srsCategoryChips", selectedSrsCategoryKey, key => {
-              selectedSrsCategoryKey = key;
-              renderSRS();
-            });
-            renderSRS();
+    /* ================================================================
+       4. 쉐도잉 탭
+       ================================================================ */
+    const ui = { cat: CATS[0].key, set: "0" };
+    let session = 0;
+    let playing = null; // { i, mode: "single" | "loop" | "seq" }
+    let gapTimer = null;
+    let ytTimer = null;
+    let dictAudioUrl = null;
+
+    // YouTube (영상 ID가 있을 때만 API 로드)
+    let ytPlayer = null, ytApiLoading = false, ytApiReady = false, ytLoadedId = "";
+
+    function ensureYouTubeApi(callback) {
+      if (ytApiReady && window.YT && window.YT.Player) { callback(); return; }
+      window.onYouTubeIframeAPIReady = function () { ytApiReady = true; callback(); };
+      if (!ytApiLoading) {
+        ytApiLoading = true;
+        const tag = document.createElement("script");
+        tag.src = "https://www.youtube.com/iframe_api";
+        tag.onerror = () => showToast("YouTube API를 불러오지 못했습니다. TTS로 재생합니다.");
+        document.head.appendChild(tag);
+      }
+    }
+    function extractYouTubeId(input) {
+      const t = (input || "").trim();
+      if (!t) return "";
+      if (/^[a-zA-Z0-9_-]{11}$/.test(t)) return t;
+      const m = t.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([a-zA-Z0-9_-]{11})/);
+      return m ? m[1] : "";
+    }
+    function syncYouTube() {
+      const id = state.yt[ui.cat] || "";
+      const box = $("ytPlayerBox");
+      $("ytUrlInput").value = id;
+      if (!id) {
+        box.classList.remove("visible");
+        try { if (ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo(); } catch (e) {}
+        return;
+      }
+      box.classList.add("visible");
+      if (id === ytLoadedId) return;
+      ensureYouTubeApi(() => {
+        const playerVars = { playsinline: 1, rel: 0, modestbranding: 1 };
+        if (window.location.origin && window.location.origin.startsWith("http")) playerVars.origin = window.location.origin;
+        if (!ytPlayer) {
+          ytPlayer = new YT.Player("ytPlayerContainer", {
+            videoId: id, playerVars,
+            events: { onReady: () => { $("ytStatusText").textContent = `연결됨: ${id}`; } }
+          });
+        } else if (ytPlayer.cueVideoById) {
+          ytPlayer.cueVideoById(id);
+          $("ytStatusText").textContent = `연결됨: ${id}`;
+        }
+        ytLoadedId = id;
+      });
+    }
+
+    function currentSetCards() {
+      if (ui.set === "mine") return userUnified().filter(c => c.cat === ui.cat);
+      const list = PRESET_CARDS.filter(c => c.cat === ui.cat);
+      const s = Number(ui.set) || 0;
+      return list.slice(s * SET_SIZE, s * SET_SIZE + SET_SIZE);
+    }
+
+    function renderSetSelect() {
+      const total = PRESET_CARDS.filter(c => c.cat === ui.cat).length;
+      const sets = Math.ceil(total / SET_SIZE);
+      const mine = state.userCards.filter(u => validCat(u.cat) === ui.cat).length;
+      if (ui.set !== "mine" && Number(ui.set) >= sets) ui.set = "0";
+      let html = "";
+      for (let i = 0; i < sets; i++) {
+        const from = i * SET_SIZE + 1, to = Math.min(total, (i + 1) * SET_SIZE);
+        html += `<option value="${i}">세트 ${i + 1} (${from}–${to})</option>`;
+      }
+      html += `<option value="mine">내 문장 (${mine})</option>`;
+      $("setSelect").innerHTML = html;
+      $("setSelect").value = ui.set;
+    }
+
+    function tokenize(card, idx) {
+      const s = card.marked.indexOf("{");
+      const e = s >= 0 ? card.marked.indexOf("}") - 1 : -1;
+      let off = 0;
+      return card.en.split(" ").map(word => {
+        const clean = word.replace(/^[^a-zA-Z'-]+|[^a-zA-Z'-]+$/g, "");
+        const isKey = s >= 0 && off >= s && off < e;
+        off += word.length + 1;
+        return `<span class="word-token ${isKey ? "key" : ""}" data-word="${esc(clean)}" data-i="${idx}">${esc(word)}</span>`;
+      }).join(" ");
+    }
+
+    function statusBadge(id) {
+      const st = cardStatus(id);
+      if (st === "mastered") return `<span class="badge mastered">익힘</span>`;
+      if (st === "learning") return `<span class="badge">학습 중</span>`;
+      return `<span class="badge new">새 표현</span>`;
+    }
+
+    function renderSentences() {
+      const list = currentSetCards();
+      const box = $("sentenceList");
+      if (!list.length) {
+        box.innerHTML = `<p style="color:var(--muted); font-size:0.9rem; padding:8px 2px;">아직 내 문장이 없습니다. 위의 '+ 내 문장 추가'로 등록하거나, 문장 속 단어를 눌러 저장해 보세요.</p>`;
+        return;
+      }
+      const hideEn = state.settings.hideEn, hideKo = state.settings.hideKo;
+      box.innerHTML = list.map((c, i) => {
+        const timing = typeof c.start === "number" && typeof c.end === "number";
+        return `
+          <div class="sentence-item" data-i="${i}">
+            <div class="item-head">
+              <div>${c.expr ? `<span class="key-expr-tag">${esc(c.expr)}${c.meaning ? ` <em>· ${esc(c.meaning)}</em>` : ""}</span>` : ""}</div>
+              ${statusBadge(c.id)}
+            </div>
+            <div class="en-line ${hideEn ? "blurred" : ""}" data-reveal="1">
+              ${timing ? `<span class="time-chip">${c.start}s–${c.end}s</span>` : ""}${tokenize(c, i)}
+            </div>
+            ${c.ko ? `<div class="ko-line ${hideKo ? "blurred" : ""}" data-reveal="1">${esc(c.ko)}</div>` : `<div class="ko-line"></div>`}
+            <div class="sentence-actions">
+              <button type="button" class="sm primary" data-act="play" data-i="${i}">▶ 듣기</button>
+              <button type="button" class="sm" data-act="loop" data-i="${i}">🔁 구간 반복</button>
+              <button type="button" class="sm" data-act="stt" data-i="${i}">🎙️ 따라 말하기</button>
+              ${c.user ? `<button type="button" class="sm danger" data-act="del" data-i="${i}">삭제</button>` : ""}
+            </div>
+            <div class="stt-result" id="stt-${i}"></div>
+          </div>`;
+      }).join("");
+      updatePlayingUI(false);
+    }
+
+    function updatePlayingUI(scroll) {
+      const items = $("sentenceList").querySelectorAll(".sentence-item");
+      items.forEach(el => {
+        const i = Number(el.dataset.i);
+        const on = !!playing && playing.i === i;
+        el.classList.toggle("playing", on);
+        const loopBtn = el.querySelector('[data-act="loop"]');
+        if (loopBtn) {
+          const looping = on && playing.mode === "loop";
+          loopBtn.classList.toggle("accent", looping);
+          loopBtn.textContent = looping ? "🔁 반복 중" : "🔁 구간 반복";
+        }
+        if (on && scroll && el.scrollIntoView) el.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      });
+      $("seqPlayBtn").textContent = playing && playing.mode === "seq" ? "⏸ 연속 재생 중" : "▶ 연속 쉐도잉";
+    }
+
+    function stopAll() {
+      session++;
+      speakTok++;
+      playing = null;
+      clearTimeout(gapTimer);
+      clearInterval(ytTimer);
+      if ("speechSynthesis" in window) { try { window.speechSynthesis.cancel(); } catch (e) {} }
+      try { if (ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo(); } catch (e) {}
+      updatePlayingUI(false);
+    }
+
+    function playCard(card, my, done) {
+      const t0 = Date.now();
+      const fin = () => { if (my === session) done(Date.now() - t0); };
+      const useYt = state.yt[card.cat] && ytPlayer && ytPlayer.seekTo &&
+        typeof card.start === "number" && typeof card.end === "number" && card.end > card.start;
+      if (useYt) {
+        clearInterval(ytTimer);
+        try { ytPlayer.setPlaybackRate(Number(state.settings.rate) || 1); } catch (e) {}
+        ytPlayer.seekTo(card.start, true);
+        ytPlayer.playVideo();
+        $("ytStatusText").textContent = `구간 재생: ${card.start}s ~ ${card.end}s`;
+        ytTimer = setInterval(() => {
+          if (my !== session) { clearInterval(ytTimer); return; }
+          if (ytPlayer.getCurrentTime && ytPlayer.getCurrentTime() >= card.end) {
+            clearInterval(ytTimer);
+            ytPlayer.pauseVideo();
+            fin();
           }
-          if (tab === "deck") {
-            renderCategoryChips("deckCategoryChips", selectedDeckCategoryKey, key => {
-              selectedDeckCategoryKey = key;
-              renderDeck();
-            });
-            renderDeck();
-          }
-        });
+        }, 120);
+      } else {
+        speak(card.en, fin);
+      }
+    }
+
+    function runChain(list, i, mode, my, rep) {
+      if (my !== session) return;
+      const card = list[i];
+      if (!card) { stopAll(); return; }
+      playing = { i, mode };
+      updatePlayingUI(mode === "seq");
+      playCard(card, my, dur => {
+        if (mode === "single") { playing = null; updatePlayingUI(false); return; }
+        // 틈 두기: 방금 들은 길이만큼 쉬어 따라 말할 시간을 줌
+        const gap = state.settings.gap ? Math.max(1200, dur + 400) : 500;
+        gapTimer = setTimeout(() => {
+          if (my !== session) return;
+          if (mode === "loop") runChain(list, i, mode, my, 0);
+          else if (rep + 1 < Number(state.settings.repeat)) runChain(list, i, mode, my, rep + 1);
+          else if (i + 1 < list.length) runChain(list, i + 1, mode, my, 0);
+          else stopAll();
+        }, gap);
       });
+    }
 
-      document.getElementById("scriptSelect").addEventListener("change", () => {
-        stopAllPlayback(false);
-        syncYouTubePlayerForCurrentScript();
-        renderShadowingChips();
-        renderSentences();
-      });
+    function startPlay(i, mode) {
+      stopAll();
+      runChain(currentSetCards(), i, mode, session, 0);
+    }
 
-      document.getElementById("stopSpeechBtn").addEventListener("click", () => stopAllPlayback(true));
-
-      document.getElementById("toggleYtSetupBtn").addEventListener("click", () => {
-        document.getElementById("ytSetupBox").classList.toggle("open");
-      });
-
-      document.getElementById("applyYtBtn").addEventListener("click", () => {
-        const vid = extractYouTubeId(document.getElementById("ytUrlInput").value);
-        if (!vid) {
-          showToast("유효한 YouTube URL 또는 11자리 영상 ID를 입력해주세요.");
-          return;
+    // 발음 체크: 인식 결과와 원문을 단어 단위로 비교(LCS)
+    const normWord = w => w.toLowerCase().replace(/[’‘]/g, "'").replace(/[^a-z0-9']/g, "");
+    function compareSpeech(target, spoken) {
+      const tw = target.split(/\s+/).filter(Boolean);
+      const a = tw.map(normWord);
+      const b = spoken.split(/\s+/).map(normWord).filter(Boolean);
+      const dp = Array.from({ length: a.length + 1 }, () => new Array(b.length + 1).fill(0));
+      for (let x = a.length - 1; x >= 0; x--) {
+        for (let y = b.length - 1; y >= 0; y--) {
+          dp[x][y] = a[x] && a[x] === b[y] ? dp[x + 1][y + 1] + 1 : Math.max(dp[x + 1][y], dp[x][y + 1]);
         }
-        const script = getCurrentScript();
-        script.youtubeId = vid;
-        saveScripts(scripts);
-        syncYouTubePlayerForCurrentScript();
-        document.getElementById("ytSetupBox").classList.remove("open");
-        showToast("YouTube 영상이 연결되었습니다.");
-      });
+      }
+      const hit = new Array(a.length).fill(false);
+      let x = 0, y = 0;
+      while (x < a.length && y < b.length) {
+        if (a[x] && a[x] === b[y]) { hit[x] = true; x++; y++; }
+        else if (dp[x + 1][y] >= dp[x][y + 1]) x++;
+        else y++;
+      }
+      const real = a.filter(Boolean).length || 1;
+      return { words: tw, hit: hit.map((h, k) => h || !a[k]), score: Math.round(hit.filter(Boolean).length / real * 100) };
+    }
 
-      document.getElementById("clearYtBtn").addEventListener("click", () => {
-        const script = getCurrentScript();
-        script.youtubeId = "";
-        saveScripts(scripts);
-        syncYouTubePlayerForCurrentScript();
-        showToast("YouTube 연결이 해제되었습니다.");
-      });
+    function checkPronunciation(i) {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const out = $(`stt-${i}`);
+      if (!SR) {
+        showToast("이 브라우저는 음성 인식을 지원하지 않습니다. Chrome 사용을 권장합니다.");
+        return;
+      }
+      const card = currentSetCards()[i];
+      if (!card || !out) return;
+      stopAll();
+      const rec = new SR();
+      rec.lang = "en-US";
+      rec.interimResults = false;
+      out.style.display = "block";
+      out.textContent = "🎙️ 듣고 있습니다... 문장을 말해 주세요.";
+      rec.onresult = e => {
+        const spoken = e.results[0][0].transcript;
+        const r = compareSpeech(card.en, spoken);
+        const msg = r.score >= 90 ? "훌륭해요!" : r.score >= 70 ? "거의 다 왔어요." : "빨간 단어를 다시 듣고 따라 해 보세요.";
+        out.innerHTML =
+          `<strong>일치도 ${r.score}%</strong> · ${msg}<br>` +
+          r.words.map((w, k) => `<span class="${r.hit[k] ? "ok" : "miss"}">${esc(w)}</span>`).join(" ") +
+          `<br><span style="color:var(--muted);">인식된 발화: "${esc(spoken)}"</span>`;
+      };
+      rec.onerror = () => { out.textContent = "음성을 인식하지 못했습니다. 마이크 권한을 확인해 주세요."; };
+      try { rec.start(); } catch (e) {}
+    }
 
-      document.getElementById("captureTimeBtn").addEventListener("click", () => {
-        if (ytPlayer && ytPlayer.getCurrentTime) {
-          const sec = ytPlayer.getCurrentTime().toFixed(1);
-          showToast(`현재 재생 위치: ${sec}초`);
-        }
-      });
+    async function fetchDictionaryInfo(word) {
+      const previewEl = $("dictPreview");
+      dictAudioUrl = null;
+      previewEl.textContent = `"${word}" 사전 조회 중...`;
+      try {
+        const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word.toLowerCase())}`);
+        if (!res.ok) throw new Error("Not found");
+        const data = await res.json();
+        const entry = data[0];
+        const ph = (entry.phonetics || []);
+        const phonetic = entry.phonetic || (ph.find(p => p.text) || {}).text || "";
+        const audioObj = ph.find(p => p.audio && p.audio.length > 0);
+        if (audioObj) dictAudioUrl = audioObj.audio;
+        if (phonetic && $("qwExpr").value === word) $("qwIpa").value = phonetic;
+        const m = (entry.meanings || [])[0] || {};
+        const def = ((m.definitions || [])[0] || {}).definition || "";
+        previewEl.innerHTML =
+          `<strong>${esc(entry.word)}</strong> ${phonetic ? `<span style="color:var(--primary);">${esc(phonetic)}</span>` : ""} ` +
+          `${m.partOfSpeech ? `<em>(${esc(m.partOfSpeech)})</em>` : ""}<br>${esc(def)}`;
+      } catch (e) {
+        previewEl.textContent = "영영 사전 항목을 찾지 못했습니다. 한국어 뜻을 직접 입력해 저장하세요.";
+      }
+    }
 
-      document.getElementById("toggleAddScriptBtn").addEventListener("click", () => {
-        document.getElementById("customScriptBox").classList.toggle("open");
-      });
+    function openQuickWord(word, example, cat) {
+      $("qwExpr").value = word;
+      $("qwMeaning").value = "";
+      $("qwIpa").value = "";
+      $("qwExample").value = example;
+      $("qwCategory").value = cat;
+      $("quickWordBox").classList.add("open");
+      $("qwMeaning").focus();
+      fetchDictionaryInfo(word);
+    }
 
-      document.getElementById("saveCustomSentenceBtn").addEventListener("click", () => {
-        const en = document.getElementById("newEnSentence").value.trim();
-        const ko = document.getElementById("newKoSentence").value.trim();
-        const startVal = parseFloat(document.getElementById("newStartSec").value);
-        const endVal = parseFloat(document.getElementById("newEndSec").value);
-        if (!en) {
-          showToast("영어 문장을 입력해주세요.");
-          return;
-        }
-        const script = getCurrentScript();
-        script.sentences.push({
-          keyExpr: "",
-          en,
-          ko: ko || "(해석 없음)",
-          start: Number.isFinite(startVal) ? startVal : null,
-          end: Number.isFinite(endVal) ? endVal : null
-        });
-        saveScripts(scripts);
-        document.getElementById("newEnSentence").value = "";
-        document.getElementById("newKoSentence").value = "";
-        document.getElementById("newStartSec").value = "";
-        document.getElementById("newEndSec").value = "";
-        document.getElementById("customScriptBox").classList.remove("open");
-        renderSentences();
-        showToast("문장이 추가되었습니다.");
-      });
-
-      document.getElementById("closeQuickWordBtn").addEventListener("click", () => {
-        document.getElementById("quickWordBox").classList.remove("open");
-      });
-
-      document.getElementById("qwSpeakBtn").addEventListener("click", () => {
-        if (dictAudioUrl) {
-          new Audio(dictAudioUrl).play().catch(() => speakTTS(document.getElementById("qwExpr").value));
-        } else {
-          speakTTS(document.getElementById("qwExpr").value);
-        }
-      });
-
-      document.getElementById("qwSaveBtn").addEventListener("click", () => {
-        const expr = document.getElementById("qwExpr").value.trim();
-        const meaning = document.getElementById("qwMeaning").value.trim();
-        const categoryKey = document.getElementById("qwCategory").value;
-        const ipa = document.getElementById("qwIpa").value.trim();
-        const example = document.getElementById("qwExample").value.trim();
-        if (!expr || !meaning) {
-          showToast("표현과 한국어 뜻을 입력해주세요.");
-          return;
-        }
-        addNewCard(expr, meaning, example, ipa, categoryKey);
-        document.getElementById("quickWordBox").classList.remove("open");
-        showToast(`"${expr}" 저장됨`);
-      });
-
-      document.getElementById("modeFlipBtn").addEventListener("click", () => {
-        srsMode = "flip";
-        document.getElementById("modeFlipBtn").classList.add("primary");
-        document.getElementById("modeClozeBtn").classList.remove("primary");
-        renderSRS();
-      });
-
-      document.getElementById("modeClozeBtn").addEventListener("click", () => {
-        srsMode = "cloze";
-        document.getElementById("modeClozeBtn").classList.add("primary");
-        document.getElementById("modeFlipBtn").classList.remove("primary");
-        renderSRS();
-      });
-
-      document.getElementById("practiceAllBtn").addEventListener("click", () => {
-        forceReviewAll = true;
-        renderSRS();
-      });
-
-      document.getElementById("addCardBtn").addEventListener("click", () => {
-        const expr = document.getElementById("addExpr").value.trim();
-        const meaning = document.getElementById("addMeaning").value.trim();
-        const categoryKey = document.getElementById("addCategory").value;
-        const ipa = document.getElementById("addIpa").value.trim();
-        const example = document.getElementById("addExample").value.trim();
-        if (!expr || !meaning) {
-          showToast("표현과 뜻을 입력해주세요.");
-          return;
-        }
-        addNewCard(expr, meaning, example, ipa, categoryKey);
-        document.getElementById("addExpr").value = "";
-        document.getElementById("addMeaning").value = "";
-        document.getElementById("addIpa").value = "";
-        document.getElementById("addExample").value = "";
-        showToast("새 카드가 등록되었습니다.");
-      });
-
-      document.getElementById("deckSearchInput").addEventListener("input", renderDeck);
-
-      document.getElementById("resetAllPresetBtn").addEventListener("click", () => {
-        cards = buildDefaultCards();
-        scripts = JSON.parse(JSON.stringify(DEFAULT_SCRIPTS));
-        saveCards(cards);
-        saveScripts(scripts);
-        initScriptSelect();
-        renderShadowingChips();
-        renderSentences();
-        renderCategoryChips("srsCategoryChips", selectedSrsCategoryKey, k => { selectedSrsCategoryKey = k; renderSRS(); });
-        renderCategoryChips("deckCategoryChips", selectedDeckCategoryKey, k => { selectedDeckCategoryKey = k; renderDeck(); });
-        renderDeck();
-        renderSRS();
-        showToast("기본 5개 상황·20개 표현이 복원되었습니다.");
-      });
-
-      document.getElementById("exportJsonBtn").addEventListener("click", () => {
-        const payload = { version: 5, exportedAt: new Date().toISOString(), cards, scripts };
-        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `echodeck-v5-backup-${todayStr()}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-      });
-
-      document.getElementById("importJsonInput").addEventListener("change", (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          try {
-            const parsed = JSON.parse(ev.target.result);
-            if (Array.isArray(parsed.cards)) {
-              cards = parsed.cards;
-              saveCards(cards);
-            }
-            if (Array.isArray(parsed.scripts)) {
-              scripts = parsed.scripts;
-              saveScripts(scripts);
-              initScriptSelect();
-              syncYouTubePlayerForCurrentScript();
-              renderShadowingChips();
-              renderSentences();
-            }
-            renderCategoryChips("deckCategoryChips", selectedDeckCategoryKey, key => {
-              selectedDeckCategoryKey = key;
-              renderDeck();
-            });
-            renderDeck();
-            showToast("백업 데이터 복원이 완료되었습니다.");
-          } catch {
-            showToast("올바른 JSON 백업 파일이 아닙니다.");
-          }
-        };
-        reader.readAsText(file);
-      });
-
-      // Boot
-      populateCategorySelects();
-      initScriptSelect();
-      renderShadowingChips();
-      renderSentences();
-      renderCategoryChips("srsCategoryChips", selectedSrsCategoryKey, key => {
-        selectedSrsCategoryKey = key;
-        renderSRS();
-      });
-      renderCategoryChips("deckCategoryChips", selectedDeckCategoryKey, key => {
-        selectedDeckCategoryKey = key;
-        renderDeck();
-      });
-      renderDeck();
+    function addUserCard(fields) {
+      const id = "c_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+      state.userCards.unshift(Object.assign({
+        id, cat: ui.cat, expr: "", meaning: "", en: "", ko: "", ipa: "", start: null, end: null
+      }, fields));
+      save();
+      srs.queue = null;
       updateStats();
-    })();
+      return id;
+    }
+
+    function deleteUserCard(id) {
+      state.userCards = state.userCards.filter(u => u.id !== id);
+      delete state.progress[id];
+      save();
+      srs.queue = null;
+      updateStats();
+    }
+
+    function renderShadowing() {
+      renderChips("shadowCatChips", CATS, ui.cat, key => {
+        stopAll();
+        ui.cat = key;
+        ui.set = "0";
+        syncYouTube();
+        renderShadowing();
+      });
+      renderSetSelect();
+      renderSentences();
+    }
+
+    /* ================================================================
+       5. SRS (오늘의 학습)
+       ================================================================ */
+    const srs = { cat: "all", mode: "speak", queue: null, cram: false, revealed: false, spoken: null };
+
+    function sm2(p, q) {
+      let { interval, repetitions, easeFactor } = p;
+      if (q === 1) {
+        repetitions = 0;
+        interval = 0;
+      } else {
+        if (repetitions === 0) interval = 1;
+        else if (repetitions === 1) interval = 3;
+        else interval = Math.round(interval * easeFactor);
+        if (q === 2) interval = Math.max(1, Math.round(interval * 0.8));
+        if (q === 4) interval = Math.round(interval * 1.3) + 1;
+        repetitions += 1;
+      }
+      easeFactor = Math.max(1.3, easeFactor + (0.1 - (4 - q) * (0.08 + (4 - q) * 0.02)));
+      return { interval, repetitions, easeFactor: Number(easeFactor.toFixed(2)), dueDate: todayStr(interval) };
+    }
+    const baseProg = id => state.progress[id] || { interval: 0, repetitions: 0, easeFactor: 2.5 };
+    const fmtInterval = n => (n <= 0 ? "오늘 다시" : n >= 30 ? `${Math.round(n / 30)}개월` : `${n}일`);
+
+    function buildQueue() {
+      const today = todayStr();
+      const inCat = c => srs.cat === "all" || c.cat === srs.cat;
+      const users = userUnified().filter(inCat);
+      const presets = PRESET_ORDERED.filter(inCat);
+      const pool = [...users, ...presets];
+      if (srs.cram) {
+        srs.queue = shuffle(pool.map(c => c.id));
+        return;
+      }
+      const due = pool
+        .filter(c => state.progress[c.id] && state.progress[c.id].dueDate <= today)
+        .sort((a, b) => (state.progress[a.id].dueDate < state.progress[b.id].dueDate ? -1 : 1));
+      const fresh = pool.filter(c => !state.progress[c.id]).slice(0, newQuotaLeft());
+      srs.queue = [...due, ...fresh].map(c => c.id);
+    }
+
+    function gradeButtons(id) {
+      if (srs.cram) {
+        return `<div class="srs-buttons two">
+          <button type="button" class="srs-btn srs-again" data-act="grade" data-q="1">다시 보기<small>뒤에서 한 번 더</small></button>
+          <button type="button" class="srs-btn srs-good" data-act="grade" data-q="3">알았음<small>다음 카드</small></button>
+        </div>`;
+      }
+      const p = baseProg(id);
+      const cell = (q, cls, name) =>
+        `<button type="button" class="srs-btn ${cls}" data-act="grade" data-q="${q}">${name}<small>${fmtInterval(sm2(p, q).interval)}</small></button>`;
+      return `<div class="srs-buttons">${cell(1, "srs-again", "Again")}${cell(2, "srs-hard", "Hard")}${cell(3, "srs-good", "Good")}${cell(4, "srs-easy", "Easy")}</div>`;
+    }
+
+    function answerBlock(card) {
+      return `
+        <div class="fc-answer">
+          <div class="fc-example">${hl(card.marked)} <button type="button" class="sm" data-act="speak">🔊</button></div>
+          ${card.ko ? `<div class="fc-sub" style="margin-bottom:8px;">${esc(card.ko)}</div>` : ""}
+          ${card.expr ? `<div class="fc-meaning">${esc(card.expr)}${card.meaning ? ` — ${esc(card.meaning)}` : ""}${card.ipa ? ` <span style="font-weight:400; color:var(--muted);">${esc(card.ipa)}</span>` : ""}</div>` : ""}
+          ${gradeButtons(card.id)}
+        </div>`;
+    }
+
+    function renderSRS() {
+      const box = $("srsContainer");
+      $("modeSwitch").querySelectorAll("button").forEach(b => b.classList.toggle("primary", b.dataset.mode === srs.mode));
+      $("cramBtn").classList.toggle("accent", srs.cram);
+      $("cramBtn").textContent = srs.cram ? "자유 연습 종료" : "자유 연습";
+      renderChips("srsCatChips", catChipItems(true), srs.cat, key => {
+        srs.cat = key; srs.queue = null; srs.revealed = false; renderSRS();
+      });
+
+      if (!srs.queue) buildQueue();
+      const cards = allCards();
+      const byId = new Map(cards.map(c => [c.id, c]));
+      srs.queue = srs.queue.filter(id => byId.has(id));
+
+      if (srs.queue.length === 0) {
+        const inCat = c => srs.cat === "all" || c.cat === srs.cat;
+        const unseen = cards.filter(c => inCat(c) && !state.progress[c.id]).length;
+        const wasCram = srs.cram;
+        srs.cram = false;
+        $("cramBtn").classList.remove("accent");
+        $("cramBtn").textContent = "자유 연습";
+        $("srsCountText").textContent = "";
+        box.innerHTML = `
+          <div style="text-align:center; padding:36px 12px;">
+            <div style="font-size:1.12rem; font-weight:700; margin-bottom:6px;">${wasCram ? "자유 연습을 마쳤습니다." : "오늘 학습을 모두 마쳤습니다! 🎉"}</div>
+            <p style="color:var(--muted); font-size:0.88rem; margin-bottom:14px;">
+              오늘 복습 ${(state.log[todayStr()] || {}).r || 0}회 · 남은 새 표현 ${unseen}개
+            </p>
+            <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
+              ${unseen > 0 ? `<button type="button" class="primary" data-act="more">새 표현 ${Math.min(10, unseen)}개 더 배우기</button>` : ""}
+              <button type="button" data-act="cram">자유 연습 (일정에 영향 없음)</button>
+            </div>
+          </div>`;
+        return;
+      }
+
+      const card = byId.get(srs.queue[0]);
+      const isNew = !state.progress[card.id];
+      const newInQueue = srs.queue.filter(id => !state.progress[id]).length;
+      $("srsCountText").innerHTML = srs.cram
+        ? `자유 연습 · 남은 카드 <strong>${srs.queue.length}</strong>`
+        : `남은 카드 <strong>${srs.queue.length}</strong> (복습 ${srs.queue.length - newInQueue} · 새 표현 ${newInQueue})`;
+
+      const head = `<div><span class="fc-cat">${esc(catLabel(card.cat))}</span>${isNew && !srs.cram ? `<span class="fc-cat fc-new">NEW</span>` : ""}</div>`;
+      const promptKo = card.ko || card.meaning || "(해석 없음)";
+      const hint = card.ko && card.expr && card.meaning ? `핵심 표현 힌트: ${esc(card.meaning)}` : "";
+      let front = "";
+
+      if (srs.mode === "speak") {
+        front = `
+          <div class="fc-main">${esc(promptKo)}</div>
+          <div class="fc-sub">${hint ? hint + "<br>" : ""}영어로 소리 내어 말한 뒤 정답을 확인하세요.</div>`;
+      } else if (srs.mode === "listen") {
+        front = `
+          <div class="fc-main">🎧</div>
+          <div class="fc-sub">듣고 뜻을 떠올려 보세요. 가능하면 그대로 따라 말해 보세요.</div>
+          <div style="margin-bottom:6px;"><button type="button" data-act="speak">🔊 다시 듣기</button></div>`;
+      } else if (srs.mode === "read") {
+        front = `
+          <div class="fc-example" style="font-size:1.2rem;">${hl(card.marked)}</div>
+          <div style="margin-bottom:6px;"><button type="button" class="sm" data-act="speak">🔊 듣기</button></div>`;
+      } else {
+        const span = keySpan(card.marked);
+        const blanked = span
+          ? esc(card.marked).replace(/\{.+?\}/, `<span style="color:var(--primary); font-weight:800;">[ ______ ]</span>`)
+          : `<span style="color:var(--primary); font-weight:800;">[ 문장 전체 ]</span>`;
+        front = `
+          <div class="fc-sub" style="font-size:0.98rem; color:var(--accent); font-weight:700;">${esc(promptKo)}</div>
+          <div class="fc-example">${blanked}</div>
+          ${hint ? `<div class="fc-sub">${hint}</div>` : ""}
+          ${srs.revealed ? "" : `
+          <div class="cloze-input-wrap">
+            <input type="text" id="clozeInput" placeholder="빈칸에 들어갈 영어 입력" autocomplete="off" autocapitalize="off" spellcheck="false" />
+            <button type="button" class="primary sm" data-act="check">확인</button>
+          </div>`}
+          <div id="clozeFeedback" style="font-size:0.88rem; margin-bottom:4px;">${srs.feedback || ""}</div>`;
+      }
+
+      const revealBtn = srs.mode === "cloze" || srs.revealed
+        ? ""
+        : `<button type="button" class="primary" data-act="reveal">정답 확인</button>`;
+
+      box.innerHTML = `<div class="flashcard">${head}${front}${revealBtn}${srs.revealed ? answerBlock(card) : ""}</div>`;
+
+      if (srs.mode === "listen" && !srs.revealed && srs.spoken !== card.id) {
+        srs.spoken = card.id;
+        speak(card.en);
+      }
+      if (srs.mode === "cloze" && !srs.revealed) {
+        const inp = $("clozeInput");
+        if (inp && inp.focus) inp.focus();
+      }
+    }
+
+    function revealCard() {
+      const card = cardById(srs.queue && srs.queue[0]);
+      if (!card || srs.revealed) return;
+      srs.revealed = true;
+      renderSRS();
+      if (srs.mode !== "read") speak(card.en);
+    }
+
+    const normText = s => String(s).toLowerCase().replace(/[’‘]/g, "'").replace(/[^a-z0-9' ]+/g, " ").replace(/\s+/g, " ").trim();
+    function checkCloze() {
+      const card = cardById(srs.queue && srs.queue[0]);
+      if (!card || srs.revealed) return;
+      const guess = normText($("clozeInput").value);
+      const span = keySpan(card.marked) || card.en;
+      const ok = !!guess && (guess === normText(span) || guess === normText(card.expr));
+      srs.feedback = ok
+        ? `<span style="color:var(--success); font-weight:700;">정답입니다!</span>`
+        : `<span style="color:var(--danger); font-weight:700;">입력: "${esc(guess || "(공백)")}"</span> → 정답: <strong>${esc(span)}</strong>`;
+      srs.revealed = true;
+      renderSRS();
+      speak(card.en);
+    }
+
+    function gradeCard(q) {
+      if (!srs.queue || !srs.queue.length || !srs.revealed) return;
+      const id = srs.queue.shift();
+      if (!srs.cram) {
+        const isNew = !state.progress[id];
+        state.progress[id] = sm2(baseProg(id), q);
+        const l = todayLog();
+        l.r += 1;
+        if (isNew) l.n += 1;
+        save();
+      }
+      if (q === 1) srs.queue.push(id); // Again: 이번 세션 끝에서 다시
+      srs.revealed = false;
+      srs.feedback = "";
+      srs.spoken = null;
+      updateStats();
+      renderSRS();
+    }
+
+    /* ================================================================
+       6. 표현 목록 탭
+       ================================================================ */
+    const deck = { cat: "all" };
+
+    function renderProgress() {
+      const cards = allCards();
+      const count = list => {
+        let m = 0, l = 0;
+        list.forEach(c => { const s = cardStatus(c.id); if (s === "mastered") m++; else if (s === "learning") l++; });
+        return { m, l, t: list.length };
+      };
+      const all = count(cards);
+      $("progSummary").textContent = `익힘 ${all.m} · 학습 중 ${all.l} · 새 표현 ${all.t - all.m - all.l} / 총 ${all.t}`;
+      $("progList").innerHTML = CATS.map(c => {
+        const r = count(cards.filter(x => x.cat === c.key));
+        const t = r.t || 1;
+        return `<div class="prog-row">
+          <span>${esc(c.label)}</span>
+          <div class="prog-bar"><i class="m" style="width:${r.m / t * 100}%"></i><i class="l" style="width:${r.l / t * 100}%"></i></div>
+          <span class="num">${r.m + r.l} / ${r.t}</span>
+        </div>`;
+      }).join("");
+    }
+
+    function renderDeck() {
+      renderProgress();
+      renderChips("deckCatChips", catChipItems(true), deck.cat, key => { deck.cat = key; renderDeck(); });
+      const q = $("deckSearchInput").value.trim().toLowerCase();
+      const today = todayStr();
+      const list = allCards().filter(c =>
+        (deck.cat === "all" || c.cat === deck.cat) &&
+        (!q || [c.expr, c.meaning, c.en, c.ko].some(v => v.toLowerCase().includes(q)))
+      );
+      const box = $("deckList");
+      if (!list.length) {
+        box.innerHTML = `<p style="color:var(--muted); font-size:0.9rem;">표시할 표현이 없습니다.</p>`;
+        return;
+      }
+      box.innerHTML = list.map(c => {
+        const p = state.progress[c.id];
+        const st = cardStatus(c.id);
+        let badge = `<span class="badge new">새 표현</span>`;
+        if (p && p.dueDate <= today) badge = `<span class="badge due">오늘 복습</span>`;
+        else if (st === "mastered") badge = `<span class="badge mastered">익힘 · ${esc(p.dueDate)}</span>`;
+        else if (p) badge = `<span class="badge">다음: ${esc(p.dueDate)}</span>`;
+        return `
+          <div class="deck-item">
+            <div>
+              <div style="font-weight:700; font-size:1rem;">
+                ${esc(c.expr || c.en)}
+                ${c.ipa ? `<span style="font-weight:400; color:var(--muted); font-size:0.84rem;">${esc(c.ipa)}</span>` : ""}
+                ${deck.cat === "all" ? `<span class="badge cat">${esc(catLabel(c.cat))}</span>` : ""}
+                ${c.user ? `<span class="badge cat">내 표현</span>` : ""}
+                ${badge}
+              </div>
+              ${c.meaning ? `<div style="font-size:0.9rem; color:#334155; margin-top:2px;">${esc(c.meaning)}</div>` : ""}
+              ${c.expr && c.en !== c.expr ? `<div style="font-size:0.86rem; color:#334155; margin-top:3px;">${hl(c.marked)}</div>` : ""}
+              ${c.ko ? `<div style="font-size:0.82rem; color:var(--muted); margin-top:1px;">${esc(c.ko)}</div>` : ""}
+            </div>
+            <div style="display:flex; gap:6px; flex-shrink:0;">
+              <button type="button" class="sm" data-act="speak" data-id="${esc(c.id)}">🔊</button>
+              ${c.user ? `<button type="button" class="sm danger" data-act="del" data-id="${esc(c.id)}">삭제</button>` : ""}
+            </div>
+          </div>`;
+      }).join("");
+    }
+
+    /* ================================================================
+       7. 이벤트 바인딩
+       ================================================================ */
+    function activeTab() {
+      const b = document.querySelector(".tab-btn.active");
+      return b ? b.dataset.tab : "shadowing";
+    }
+
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        stopAll();
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+        btn.classList.add("active");
+        const tab = btn.dataset.tab;
+        $(`view-${tab}`).classList.add("active");
+        if (tab === "shadowing") renderShadowing();
+        if (tab === "srs") { srs.queue = null; srs.revealed = false; srs.spoken = null; renderSRS(); }
+        if (tab === "deck") renderDeck();
+      });
+    });
+
+    // --- 쉐도잉 ---
+    $("setSelect").addEventListener("change", e => { stopAll(); ui.set = e.target.value; renderSentences(); });
+    $("seqPlayBtn").addEventListener("click", () => {
+      if (playing && playing.mode === "seq") { stopAll(); return; }
+      if (!currentSetCards().length) return;
+      startPlay(0, "seq");
+    });
+    $("stopBtn").addEventListener("click", stopAll);
+
+    $("rateSelect").addEventListener("change", e => { state.settings.rate = Number(e.target.value); save(); });
+    $("repeatSelect").addEventListener("change", e => { state.settings.repeat = Number(e.target.value); save(); });
+    $("voiceSelect").addEventListener("change", e => { state.settings.voice = e.target.value; save(); speak("Nice to meet you."); });
+    $("gapToggle").addEventListener("change", e => { state.settings.gap = e.target.checked; save(); });
+    $("hideEnToggle").addEventListener("change", e => { state.settings.hideEn = e.target.checked; save(); renderSentences(); });
+    $("hideKoToggle").addEventListener("change", e => { state.settings.hideKo = e.target.checked; save(); renderSentences(); });
+
+    $("sentenceList").addEventListener("click", e => {
+      const t = e.target;
+      const blurred = t.closest(".blurred");
+      if (blurred) { blurred.classList.remove("blurred"); return; }
+      const btn = t.closest("[data-act]");
+      if (btn) {
+        const i = Number(btn.dataset.i);
+        const act = btn.dataset.act;
+        if (act === "play") startPlay(i, "single");
+        else if (act === "loop") {
+          if (playing && playing.mode === "loop" && playing.i === i) stopAll();
+          else startPlay(i, "loop");
+        }
+        else if (act === "stt") checkPronunciation(i);
+        else if (act === "del") {
+          const card = currentSetCards()[i];
+          if (card && card.user) {
+            stopAll();
+            deleteUserCard(card.id);
+            renderSetSelect();
+            renderSentences();
+            showToast("삭제되었습니다.");
+          }
+        }
+        return;
+      }
+      const tok = t.closest(".word-token");
+      if (tok && tok.dataset.word) {
+        const card = currentSetCards()[Number(tok.dataset.i)];
+        if (card) openQuickWord(tok.dataset.word, card.en, ui.cat);
+      }
+    });
+
+    $("toggleYtSetupBtn").addEventListener("click", () => $("ytSetupBox").classList.toggle("open"));
+    $("applyYtBtn").addEventListener("click", () => {
+      const vid = extractYouTubeId($("ytUrlInput").value);
+      if (!vid) { showToast("유효한 YouTube URL 또는 11자리 영상 ID를 입력해 주세요."); return; }
+      state.yt[ui.cat] = vid;
+      save();
+      syncYouTube();
+      $("ytSetupBox").classList.remove("open");
+      showToast("YouTube 영상이 연결되었습니다.");
+    });
+    $("clearYtBtn").addEventListener("click", () => {
+      delete state.yt[ui.cat];
+      save();
+      syncYouTube();
+      showToast("YouTube 연결이 해제되었습니다.");
+    });
+    $("captureTimeBtn").addEventListener("click", () => {
+      if (ytPlayer && ytPlayer.getCurrentTime) showToast(`현재 재생 위치: ${ytPlayer.getCurrentTime().toFixed(1)}초`);
+    });
+
+    $("toggleAddBtn").addEventListener("click", () => $("customBox").classList.toggle("open"));
+    $("saveCustomBtn").addEventListener("click", () => {
+      const en = stripMarks($("newEn").value.trim());
+      const ko = $("newKo").value.trim();
+      const s = parseFloat($("newStart").value);
+      const e = parseFloat($("newEnd").value);
+      if (!en) { showToast("영어 문장을 입력해 주세요."); return; }
+      addUserCard({ cat: ui.cat, en, ko, start: Number.isFinite(s) ? s : null, end: Number.isFinite(e) ? e : null });
+      ["newEn", "newKo", "newStart", "newEnd"].forEach(id => { $(id).value = ""; });
+      $("customBox").classList.remove("open");
+      ui.set = "mine";
+      renderSetSelect();
+      renderSentences();
+      showToast("문장이 추가되었습니다. '내 문장' 세트에서 확인하세요.");
+    });
+
+    $("closeQuickWordBtn").addEventListener("click", () => $("quickWordBox").classList.remove("open"));
+    $("qwSpeakBtn").addEventListener("click", () => {
+      const w = $("qwExpr").value;
+      if (dictAudioUrl) new Audio(dictAudioUrl).play().catch(() => speak(w));
+      else speak(w);
+    });
+    $("qwSaveBtn").addEventListener("click", () => {
+      const expr = $("qwExpr").value.trim();
+      const meaning = $("qwMeaning").value.trim();
+      if (!expr || !meaning) { showToast("표현과 한국어 뜻을 입력해 주세요."); return; }
+      addUserCard({
+        cat: validCat($("qwCategory").value), expr, meaning,
+        en: stripMarks($("qwExample").value.trim()), ipa: $("qwIpa").value.trim()
+      });
+      $("quickWordBox").classList.remove("open");
+      renderSetSelect();
+      if (ui.set === "mine") renderSentences();
+      showToast(`"${expr}" 저장됨`);
+    });
+
+    // --- SRS ---
+    $("modeSwitch").addEventListener("click", e => {
+      const b = e.target.closest("[data-mode]");
+      if (!b) return;
+      srs.mode = b.dataset.mode;
+      srs.revealed = false;
+      srs.feedback = "";
+      srs.spoken = null;
+      renderSRS();
+    });
+    $("newPerDaySelect").addEventListener("change", e => {
+      state.settings.newPerDay = Number(e.target.value);
+      save();
+      srs.queue = null;
+      srs.revealed = false;
+      updateStats();
+      renderSRS();
+    });
+    function toggleCram(on) {
+      srs.cram = on;
+      srs.queue = null;
+      srs.revealed = false;
+      srs.feedback = "";
+      srs.spoken = null;
+      renderSRS();
+    }
+    $("cramBtn").addEventListener("click", () => toggleCram(!srs.cram));
+    $("srsContainer").addEventListener("click", e => {
+      const b = e.target.closest("[data-act]");
+      if (!b) return;
+      const act = b.dataset.act;
+      if (act === "reveal") revealCard();
+      else if (act === "speak") { const c = cardById(srs.queue && srs.queue[0]); if (c) speak(c.en); }
+      else if (act === "grade") gradeCard(Number(b.dataset.q));
+      else if (act === "check") checkCloze();
+      else if (act === "more") { todayLog().x += 10; save(); srs.queue = null; updateStats(); renderSRS(); }
+      else if (act === "cram") toggleCram(true);
+    });
+    $("srsContainer").addEventListener("keydown", e => {
+      if (e.key === "Enter" && e.target.id === "clozeInput") checkCloze();
+    });
+    document.addEventListener("keydown", e => {
+      if (activeTab() !== "srs") return;
+      const tag = (e.target && e.target.tagName) || "";
+      if (/^(INPUT|SELECT|TEXTAREA|BUTTON)$/.test(tag)) return;
+      if (e.key === " " && !srs.revealed && srs.mode !== "cloze") { e.preventDefault(); revealCard(); }
+      else if (srs.revealed && /^[1-4]$/.test(e.key)) {
+        if (srs.cram && (e.key === "2" || e.key === "4")) return;
+        gradeCard(Number(e.key));
+      }
+    });
+
+    // --- 표현 목록 ---
+    $("addCardBtn").addEventListener("click", () => {
+      const expr = $("addExpr").value.trim();
+      const meaning = $("addMeaning").value.trim();
+      if (!expr || !meaning) { showToast("표현과 뜻을 입력해 주세요."); return; }
+      addUserCard({
+        cat: validCat($("addCategory").value), expr, meaning,
+        en: stripMarks($("addExample").value.trim()), ko: $("addExampleKo").value.trim(), ipa: $("addIpa").value.trim()
+      });
+      ["addExpr", "addMeaning", "addIpa", "addExample", "addExampleKo"].forEach(id => { $(id).value = ""; });
+      renderDeck();
+      showToast("새 카드가 등록되었습니다.");
+    });
+    $("deckSearchInput").addEventListener("input", renderDeck);
+    $("deckList").addEventListener("click", e => {
+      const b = e.target.closest("[data-act]");
+      if (!b) return;
+      const c = cardById(b.dataset.id);
+      if (!c) return;
+      if (b.dataset.act === "speak") speak(c.en);
+      else if (b.dataset.act === "del" && c.user) { deleteUserCard(c.id); renderDeck(); showToast("삭제되었습니다."); }
+    });
+
+    $("exportJsonBtn").addEventListener("click", () => {
+      const payload = { app: "echodeck", version: 6, exportedAt: new Date().toISOString(), state };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `echodeck-v6-backup-${todayStr()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+    $("importJsonInput").addEventListener("change", e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try {
+          const parsed = JSON.parse(ev.target.result);
+          if (parsed && parsed.state && typeof parsed.state === "object") {
+            state = normalizeState(parsed.state);
+          } else if (parsed && (Array.isArray(parsed.cards) || Array.isArray(parsed.scripts))) {
+            migrateV5(state, parsed.cards, parsed.scripts); // v5 백업 파일
+          } else {
+            throw new Error("format");
+          }
+          save();
+          srs.queue = null;
+          applySettingsToUI();
+          syncYouTube();
+          updateStats();
+          renderDeck();
+          showToast("백업 데이터를 복원했습니다.");
+        } catch (err) {
+          showToast("올바른 EchoDeck 백업 파일이 아닙니다.");
+        }
+        e.target.value = "";
+      };
+      reader.readAsText(file);
+    });
+    $("resetProgressBtn").addEventListener("click", () => {
+      if (!window.confirm("모든 복습 기록과 연속 학습일을 초기화할까요?\n(직접 추가한 표현은 유지됩니다.)")) return;
+      state.progress = {};
+      state.log = {};
+      save();
+      srs.queue = null;
+      updateStats();
+      renderDeck();
+      showToast("진도가 초기화되었습니다.");
+    });
+
+    /* ================================================================
+       8. 시작
+       ================================================================ */
+    function applySettingsToUI() {
+      const s = state.settings;
+      $("rateSelect").value = String(s.rate);
+      if (!$("rateSelect").value) { s.rate = 1; $("rateSelect").value = "1"; }
+      $("repeatSelect").value = String(s.repeat);
+      $("newPerDaySelect").value = String(s.newPerDay);
+      $("gapToggle").checked = !!s.gap;
+      $("hideEnToggle").checked = !!s.hideEn;
+      $("hideKoToggle").checked = !!s.hideKo;
+    }
+
+    const catOptions = CATS.map(c => `<option value="${c.key}">${esc(c.label)}</option>`).join("");
+    $("qwCategory").innerHTML = catOptions;
+    $("addCategory").innerHTML = catOptions;
+
+    applySettingsToUI();
+    loadVoices();
+    if ("speechSynthesis" in window) {
+      try { window.speechSynthesis.addEventListener("voiceschanged", loadVoices); } catch (e) {}
+    }
+    renderShadowing();
+    syncYouTube();
+    updateStats();
+  })();
   </script>
 </body>
 </html>
