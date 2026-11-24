@@ -703,4 +703,963 @@
           {
             keyExpr: "grab a bite",
             en: "Do you know any good places around here to grab a quick bite?",
-            ko: "이 근처
+            ko: "이 근처에 간단히 요기할 만한 괜찮은 곳 아시나요?",
+            start: null, end: null
+          },
+          {
+            keyExpr: "try on",
+            en: "Excuse me, could I try this jacket on in a medium size?",
+            ko: "실례합니다, 이 재킷 미디엄 사이즈로 입어봐도 될까요?",
+            start: null, end: null
+          },
+          {
+            keyExpr: "split the bill",
+            en: "Could we split the bill, or is it easier to pay all together?",
+            ko: "계산을 따로 나눠서 할 수 있을까요, 아니면 한 번에 결제하는 게 편할까요?",
+            start: null, end: null
+          }
+        ]
+      },
+      {
+        id: "cat_email",
+        categoryKey: "email",
+        title: "📧 이메일·전화 응대 정중 표현 (4문장)",
+        youtubeId: "",
+        sentences: [
+          {
+            keyExpr: "get back to",
+            en: "Thank you for reaching out. I will get back to you by tomorrow afternoon.",
+            ko: "연락해 주셔서 감사합니다. 내일 오후까지 다시 회신드리겠습니다.",
+            start: null, end: null
+          },
+          {
+            keyExpr: "put someone through",
+            en: "Please hold on a moment while I put you through to the manager.",
+            ko: "담당 매니저분께 연결해 드릴 테니 잠시만 기다려 주세요.",
+            start: null, end: null
+          },
+          {
+            keyExpr: "touch base",
+            en: "I'm just writing to touch base regarding our upcoming project deadline.",
+            ko: "다가오는 프로젝트 마감일과 관련해 진행 상황을 확인차 연락드립니다.",
+            start: null, end: null
+          },
+          {
+            keyExpr: "keep someone posted",
+            en: "We are currently looking into the issue and will keep you posted.",
+            ko: "현재 해당 문제를 확인 중이며 진행 상황을 계속 공유해 드리겠습니다.",
+            start: null, end: null
+          }
+        ]
+      },
+      {
+        id: "cat_opinion",
+        categoryKey: "opinion",
+        title: "💬 의견 제시·토론 논리 표현 (4문장)",
+        youtubeId: "",
+        sentences: [
+          {
+            keyExpr: "from my perspective",
+            en: "From my perspective, focusing on user experience should be our top priority.",
+            ko: "제 관점에서는 사용자 경험에 집중하는 것이 최우선 과제가 되어야 합니다.",
+            start: null, end: null
+          },
+          {
+            keyExpr: "have a point",
+            en: "You have a point there, though we also need to consider the budget.",
+            ko: "그 말씀도 일리가 있지만, 예산 부분도 함께 고려해야 합니다.",
+            start: null, end: null
+          },
+          {
+            keyExpr: "boil down to",
+            en: "Ultimately, the decision boils down to cost versus reliability.",
+            ko: "궁극적으로 이 결정은 비용 대 신뢰성의 문제로 귀결됩니다.",
+            start: null, end: null
+          },
+          {
+            keyExpr: "weigh the pros and cons",
+            en: "Let's carefully weigh the pros and cons before making a final call.",
+            ko: "최종 결정을 내리기 전에 장단점을 신중하게 따져봅시다.",
+            start: null, end: null
+          }
+        ]
+      }
+    ];
+
+    function buildDefaultCards() {
+      const raw = [
+        { id: "preset_b1", categoryKey: "business", expression: "on the same page", meaning: "같은 생각인, 의견·이해가 일치하는", ipa: "/ɒn ðə seɪm peɪdʒ/", example: "Let's make sure we're all on the same page before moving forward." },
+        { id: "preset_b2", categoryKey: "business", expression: "pull off", meaning: "(어려운 일을) 해내다, 성공시키다", ipa: "/pʊl ɒf/", example: "I didn't think she could pull off the presentation on such short notice." },
+        { id: "preset_b3", categoryKey: "business", expression: "walk someone through", meaning: "~에게 단계별로 차근차근 설명하다", ipa: "/wɔːk θruː/", example: "Could you walk me through the updated schedule step by step?" },
+        { id: "preset_b4", categoryKey: "business", expression: "circle back to", meaning: "(나중에) ~로 다시 돌아와 논의하다", ipa: "/ˈsɜːrkl bæk/", example: "Let's circle back to that issue once we gather more data." },
+        { id: "preset_d1", categoryKey: "daily", expression: "take a rain check", meaning: "다음 기회로 미루다", ipa: "/teɪk ə reɪn tʃek/", example: "Something urgent came up at work, so I have to take a rain check." },
+        { id: "preset_d2", categoryKey: "daily", expression: "get the hang of", meaning: "~의 요령을 익히다, 익숙해지다", ipa: "/ɡet ðə hæŋ ɒv/", example: "It took me a while to get the hang of using the new system." },
+        { id: "preset_d3", categoryKey: "daily", expression: "beat yourself up", meaning: "자책하다, 스스로를 괴롭히다", ipa: "/biːt jɔːrˈself ʌp/", example: "Don't beat yourself up over a minor mistake." },
+        { id: "preset_d4", categoryKey: "daily", expression: "call it a day", meaning: "오늘 일과를 마치다, 이만 마무리하다", ipa: "/kɔːl ɪt ə deɪ/", example: "We've made great progress today, so let's call it a day." },
+        { id: "preset_t1", categoryKey: "travel", expression: "under [Name]", meaning: "~의 이름으로 (예약된)", ipa: "/ˈʌndər/", example: "Hi, I have a reservation under Kim and would like to check in." },
+        { id: "preset_t2", categoryKey: "travel", expression: "grab a bite", meaning: "간단히 식사하다, 요기하다", ipa: "/ɡræb ə baɪt/", example: "Do you know any good places around here to grab a quick bite?" },
+        { id: "preset_t3", categoryKey: "travel", expression: "try on", meaning: "(옷·신발 등을) 입어보다, 신어보다", ipa: "/traɪ ɒn/", example: "Excuse me, could I try this jacket on in a medium size?" },
+        { id: "preset_t4", categoryKey: "travel", expression: "split the bill", meaning: "계산을 나누다, 더치페이하다", ipa: "/splɪt ðə bɪl/", example: "Could we split the bill, or is it easier to pay all together?" },
+        { id: "preset_e1", categoryKey: "email", expression: "get back to", meaning: "~에게 다시 연락하다, 회신하다", ipa: "/ɡet bæk tuː/", example: "Thank you for reaching out. I will get back to you by tomorrow afternoon." },
+        { id: "preset_e2", categoryKey: "email", expression: "put someone through", meaning: "(전화를) ~에게 연결해 주다", ipa: "/pʊt θruː/", example: "Please hold on a moment while I put you through to the manager." },
+        { id: "preset_e3", categoryKey: "email", expression: "touch base", meaning: "연락을 취하다, 상황을 확인하다", ipa: "/tʌtʃ beɪs/", example: "I'm just writing to touch base regarding our upcoming project deadline." },
+        { id: "preset_e4", categoryKey: "email", expression: "keep someone posted", meaning: "~에게 계속 소식·진행 상황을 알리다", ipa: "/kiːp ˈpoʊstɪd/", example: "We are currently looking into the issue and will keep you posted." },
+        { id: "preset_o1", categoryKey: "opinion", expression: "from my perspective", meaning: "제 관점에서는, 제가 보기에는", ipa: "/frɒm maɪ pərˈspektɪv/", example: "From my perspective, focusing on user experience should be our top priority." },
+        { id: "preset_o2", categoryKey: "opinion", expression: "have a point", meaning: "일리가 있다, 타당한 지적이다", ipa: "/hæv ə pɔɪnt/", example: "You have a point there, though we also need to consider the budget." },
+        { id: "preset_o3", categoryKey: "opinion", expression: "boil down to", meaning: "결국 ~로 귀결되다, 요약되다", ipa: "/bɔɪl daʊn tuː/", example: "Ultimately, the decision boils down to cost versus reliability." },
+        { id: "preset_o4", categoryKey: "opinion", expression: "weigh the pros and cons", meaning: "장단점을 따져보다", ipa: "/weɪ ðə proʊz ænd kɒnz/", example: "Let's carefully weigh the pros and cons before making a final call." }
+      ];
+      return raw.map(item => ({
+        ...item,
+        interval: 0,
+        repetitions: 0,
+        easeFactor: 2.5,
+        dueDate: todayStr()
+      }));
+    }
+
+    function todayStr(offsetDays = 0) {
+      const d = new Date();
+      d.setDate(d.getDate() + offsetDays);
+      return d.toISOString().slice(0, 10);
+    }
+
+    function loadCards() {
+      const defaults = buildDefaultCards();
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(defaults));
+        return defaults;
+      }
+      try {
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed) || parsed.length === 0) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(defaults));
+          return defaults;
+        }
+        return parsed.map(c => ({
+          categoryKey: c.categoryKey || "business",
+          ipa: "",
+          ...c
+        }));
+      } catch {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(defaults));
+        return defaults;
+      }
+    }
+
+    function saveCards(list) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+      updateStats();
+    }
+
+    function loadScripts() {
+      const raw = localStorage.getItem(SCRIPTS_KEY);
+      if (!raw) {
+        localStorage.setItem(SCRIPTS_KEY, JSON.stringify(DEFAULT_SCRIPTS));
+        return JSON.parse(JSON.stringify(DEFAULT_SCRIPTS));
+      }
+      try {
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed) || parsed.length === 0) {
+          localStorage.setItem(SCRIPTS_KEY, JSON.stringify(DEFAULT_SCRIPTS));
+          return JSON.parse(JSON.stringify(DEFAULT_SCRIPTS));
+        }
+        return parsed;
+      } catch {
+        localStorage.setItem(SCRIPTS_KEY, JSON.stringify(DEFAULT_SCRIPTS));
+        return JSON.parse(JSON.stringify(DEFAULT_SCRIPTS));
+      }
+    }
+
+    function saveScripts(list) {
+      localStorage.setItem(SCRIPTS_KEY, JSON.stringify(list));
+    }
+
+    let cards = loadCards();
+    let scripts = loadScripts();
+    let loopSentenceIdx = null;
+    let currentPlayingIdx = null;
+    let forceReviewAll = false;
+    let srsMode = "flip";
+    let selectedDeckCategoryKey = "all";
+    let selectedSrsCategoryKey = "all";
+    let dictAudioUrl = null;
+
+    // YouTube Player State
+    let ytPlayer = null;
+    let ytApiReady = false;
+    let ytMonitorTimer = null;
+
+    window.onYouTubeIframeAPIReady = function() {
+      ytApiReady = true;
+      syncYouTubePlayerForCurrentScript();
+    };
+
+    function extractYouTubeId(input) {
+      const trimmed = (input || "").trim();
+      if (!trimmed) return "";
+      if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return trimmed;
+      const m = trimmed.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([a-zA-Z0-9_-]{11})/);
+      return m ? m[1] : "";
+    }
+
+    function getCurrentScript() {
+      const id = document.getElementById("scriptSelect").value;
+      return scripts.find(s => s.id === id) || scripts[0];
+    }
+
+    function syncYouTubePlayerForCurrentScript() {
+      const script = getCurrentScript();
+      const box = document.getElementById("ytPlayerBox");
+      document.getElementById("ytUrlInput").value = script.youtubeId || "";
+
+      if (!script.youtubeId) {
+        box.classList.remove("visible");
+        stopAllPlayback(false);
+        return;
+      }
+
+      box.classList.add("visible");
+      if (!ytApiReady) return;
+
+      const playerVars = { playsinline: 1, rel: 0, modestbranding: 1 };
+      if (window.location.origin && window.location.origin.startsWith("http")) {
+        playerVars.origin = window.location.origin;
+      }
+
+      if (!ytPlayer) {
+        ytPlayer = new YT.Player("ytPlayerContainer", {
+          videoId: script.youtubeId,
+          playerVars,
+          events: {
+            onReady: () => {
+              document.getElementById("ytStatusText").textContent = `연결됨: ${script.youtubeId}`;
+            }
+          }
+        });
+      } else if (ytPlayer.cueVideoById) {
+        ytPlayer.cueVideoById(script.youtubeId);
+        document.getElementById("ytStatusText").textContent = `연결됨: ${script.youtubeId}`;
+      }
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.classList.add("show");
+      clearTimeout(el._t);
+      el._t = setTimeout(() => el.classList.remove("show"), 2300);
+    }
+
+    function updateStats() {
+      const today = todayStr();
+      const dueCount = cards.filter(c => c.dueDate <= today).length;
+      document.getElementById("dueCountBadge").textContent = dueCount;
+      document.getElementById("totalCountBadge").textContent = cards.length;
+    }
+
+    // Populate Category Selects
+    function populateCategorySelects() {
+      const optionsHtml = CATEGORY_META.filter(c => c.key !== "all")
+        .map(c => `<option value="${c.key}">${c.label}</option>`)
+        .join("");
+      document.getElementById("qwCategory").innerHTML = optionsHtml;
+      document.getElementById("addCategory").innerHTML = optionsHtml;
+    }
+
+    // Reset Preset Data
+    document.getElementById("resetAllPresetBtn").addEventListener("click", () => {
+      cards = buildDefaultCards();
+      scripts = JSON.parse(JSON.stringify(DEFAULT_SCRIPTS));
+      saveCards(cards);
+      saveScripts(scripts);
+      initScriptSelect();
+      renderShadowingChips();
+      renderSentences();
+      renderCategoryChips("srsCategoryChips", selectedSrsCategoryKey, k => { selectedSrsCategoryKey = k; renderSRS(); });
+      renderCategoryChips("deckCategoryChips", selectedDeckCategoryKey, k => { selectedDeckCategoryKey = k; renderDeck(); });
+      renderDeck();
+      renderSRS();
+      showToast("기본 5개 상황·20개 표현이 초기화되었습니다.");
+    });
+
+    // Tabs
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+        btn.classList.add("active");
+        const tab = btn.dataset.tab;
+        document.getElementById(`view-${tab}`).classList.add("active");
+        if (tab === "srs") {
+          renderCategoryChips("srsCategoryChips", selectedSrsCategoryKey, key => {
+            selectedSrsCategoryKey = key;
+            renderSRS();
+          });
+          renderSRS();
+        }
+        if (tab === "deck") {
+          renderCategoryChips("deckCategoryChips", selectedDeckCategoryKey, key => {
+            selectedDeckCategoryKey = key;
+            renderDeck();
+          });
+          renderDeck();
+        }
+      });
+    });
+
+    function renderShadowingChips() {
+      const container = document.getElementById("shadowingCategoryChips");
+      const currentScript = getCurrentScript();
+      container.innerHTML = scripts.map(s => `
+        <button class="chip ${s.id === currentScript.id ? "active" : ""}" data-sid="${s.id}">
+          ${getCategoryLabel(s.categoryKey)}
+        </button>
+      `).join("");
+      container.querySelectorAll(".chip").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.getElementById("scriptSelect").value = btn.dataset.sid;
+          stopAllPlayback(false);
+          syncYouTubePlayerForCurrentScript();
+          renderShadowingChips();
+          renderSentences();
+        });
+      });
+    }
+
+    function renderCategoryChips(containerId, activeKey, onSelect) {
+      const el = document.getElementById(containerId);
+      el.innerHTML = CATEGORY_META.map(cat => {
+        const count = cat.key === "all"
+          ? cards.length
+          : cards.filter(c => c.categoryKey === cat.key).length;
+        return `<button class="chip ${activeKey === cat.key ? "active" : ""}" data-key="${cat.key}">${cat.label} (${count})</button>`;
+      }).join("");
+      el.querySelectorAll(".chip").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const chosen = btn.dataset.key;
+          renderCategoryChips(containerId, chosen, onSelect);
+          onSelect(chosen);
+        });
+      });
+    }
+
+    function stopAllPlayback(rerender = true) {
+      loopSentenceIdx = null;
+      currentPlayingIdx = null;
+      clearInterval(ytMonitorTimer);
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+      if (ytPlayer && ytPlayer.pauseVideo) {
+        try { ytPlayer.pauseVideo(); } catch {}
+      }
+      if (rerender) renderSentences();
+    }
+
+    document.getElementById("stopSpeechBtn").addEventListener("click", () => stopAllPlayback(true));
+
+    function speakTTS(text, onEndCallback = null) {
+      if (!("speechSynthesis" in window)) {
+        showToast("이 브라우저는 음성 합성을 지원하지 않습니다.");
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "en-US";
+      utter.rate = parseFloat(document.getElementById("rateSelect").value || "1");
+      if (onEndCallback) utter.onend = onEndCallback;
+      window.speechSynthesis.speak(utter);
+    }
+
+    function playSentenceSegment(idx, isLoop) {
+      const script = getCurrentScript();
+      const item = script.sentences[idx];
+      const rate = parseFloat(document.getElementById("rateSelect").value || "1");
+
+      clearInterval(ytMonitorTimer);
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+
+      currentPlayingIdx = idx;
+      renderSentences();
+
+      const hasYtSegment = script.youtubeId && ytPlayer && ytPlayer.seekTo && typeof item.start === "number" && typeof item.end === "number" && item.end > item.start;
+
+      if (hasYtSegment) {
+        ytPlayer.setPlaybackRate(rate);
+        ytPlayer.seekTo(item.start, true);
+        ytPlayer.playVideo();
+        document.getElementById("ytStatusText").textContent = `구간 재생: ${item.start}s ~ ${item.end}s`;
+
+        ytMonitorTimer = setInterval(() => {
+          if (!ytPlayer || !ytPlayer.getCurrentTime) return;
+          const now = ytPlayer.getCurrentTime();
+          if (now >= item.end) {
+            if (isLoop && loopSentenceIdx === idx) {
+              ytPlayer.seekTo(item.start, true);
+            } else {
+              clearInterval(ytMonitorTimer);
+              ytPlayer.pauseVideo();
+              currentPlayingIdx = null;
+              renderSentences();
+            }
+          }
+        }, 120);
+      } else {
+        const runTts = () => {
+          speakTTS(item.en, () => {
+            if (isLoop && loopSentenceIdx === idx) {
+              setTimeout(runTts, 600);
+            } else {
+              currentPlayingIdx = null;
+              renderSentences();
+            }
+          });
+        };
+        runTts();
+      }
+    }
+
+    window.playSingle = function(idx) {
+      loopSentenceIdx = null;
+      playSentenceSegment(idx, false);
+    };
+
+    window.toggleLoop = function(idx) {
+      if (loopSentenceIdx === idx) {
+        stopAllPlayback(true);
+        return;
+      }
+      loopSentenceIdx = idx;
+      playSentenceSegment(idx, true);
+    };
+
+    // YouTube Setup Handlers
+    document.getElementById("toggleYtSetupBtn").addEventListener("click", () => {
+      document.getElementById("ytSetupBox").classList.toggle("open");
+    });
+
+    document.getElementById("applyYtBtn").addEventListener("click", () => {
+      const vid = extractYouTubeId(document.getElementById("ytUrlInput").value);
+      if (!vid) {
+        showToast("유효한 YouTube URL 또는 11자리 영상 ID를 입력해주세요.");
+        return;
+      }
+      const script = getCurrentScript();
+      script.youtubeId = vid;
+      saveScripts(scripts);
+      syncYouTubePlayerForCurrentScript();
+      document.getElementById("ytSetupBox").classList.remove("open");
+      showToast("YouTube 영상이 연결되었습니다.");
+    });
+
+    document.getElementById("clearYtBtn").addEventListener("click", () => {
+      const script = getCurrentScript();
+      script.youtubeId = "";
+      saveScripts(scripts);
+      syncYouTubePlayerForCurrentScript();
+      showToast("YouTube 연결이 해제되었습니다.");
+    });
+
+    document.getElementById("captureTimeBtn").addEventListener("click", () => {
+      if (ytPlayer && ytPlayer.getCurrentTime) {
+        const sec = ytPlayer.getCurrentTime().toFixed(1);
+        showToast(`현재 재생 위치: ${sec}초`);
+      }
+    });
+
+    function initScriptSelect() {
+      const sel = document.getElementById("scriptSelect");
+      sel.innerHTML = scripts.map(s => `<option value="${s.id}">${s.title}</option>`).join("");
+      sel.addEventListener("change", () => {
+        stopAllPlayback(false);
+        syncYouTubePlayerForCurrentScript();
+        renderShadowingChips();
+        renderSentences();
+      });
+    }
+
+    function tokenizeSentence(sentence, sIdx) {
+      return sentence.split(" ").map(word => {
+        const clean = word.replace(/^[^a-zA-Z'-]+|[^a-zA-Z'-]+$/g, "");
+        return `<span class="word-token" data-word="${encodeURIComponent(clean)}" data-sidx="${sIdx}">${word}</span>`;
+      }).join(" ");
+    }
+
+    function renderSentences() {
+      const script = getCurrentScript();
+      const container = document.getElementById("sentenceList");
+
+      container.innerHTML = script.sentences.map((item, idx) => {
+        const isPlaying = currentPlayingIdx === idx;
+        const isLooping = loopSentenceIdx === idx;
+        const hasTiming = typeof item.start === "number" && typeof item.end === "number";
+        return `
+          <div class="sentence-item ${isPlaying ? "playing" : ""}">
+            ${item.keyExpr ? `<div class="key-expr-tag">핵심 표현: ${item.keyExpr}</div>` : ""}
+            <div class="en-line">
+              ${hasTiming ? `<span class="time-chip">${item.start}s–${item.end}s</span>` : ""}
+              ${tokenizeSentence(item.en, idx)}
+            </div>
+            <div class="ko-line">${item.ko}</div>
+            <div class="sentence-actions">
+              <button class="sm primary" onclick="playSingle(${idx})">▶ 듣기</button>
+              <button class="sm ${isLooping ? "accent" : ""}" onclick="toggleLoop(${idx})">${isLooping ? "🔁 반복 중" : "🔁 구간 반복"}</button>
+              <button class="sm" onclick="checkPronunciation(${idx})">🎙️ 따라 말하기</button>
+            </div>
+            <div class="stt-result" id="stt-${idx}"></div>
+          </div>
+        `;
+      }).join("");
+
+      container.querySelectorAll(".word-token").forEach(span => {
+        span.addEventListener("click", () => {
+          const word = decodeURIComponent(span.dataset.word);
+          const sIdx = parseInt(span.dataset.sidx, 10);
+          if (!word) return;
+          openQuickWord(word, script.sentences[sIdx].en, script.categoryKey || "business");
+        });
+      });
+    }
+
+    window.checkPronunciation = function(idx) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const resultEl = document.getElementById(`stt-${idx}`);
+      if (!SpeechRecognition) {
+        showToast("현재 브라우저에서는 음성 인식이 제한됩니다. 쉐도잉 듣기 반복을 활용해주세요.");
+        return;
+      }
+      const target = getCurrentScript().sentences[idx].en;
+      const rec = new SpeechRecognition();
+      rec.lang = "en-US";
+      rec.interimResults = false;
+      resultEl.style.display = "block";
+      resultEl.textContent = "🎙️ 듣고 있습니다... 문장을 또박또박 읽어주세요.";
+
+      rec.onresult = (e) => {
+        const spoken = e.results[0][0].transcript;
+        resultEl.innerHTML = `<strong>인식 발화:</strong> "${spoken}"<br><span style="color:var(--muted);">원문 대조: "${target}"</span>`;
+      };
+      rec.onerror = () => {
+        resultEl.textContent = "음성을 인식하지 못했습니다. 마이크 권한을 확인해주세요.";
+      };
+      rec.start();
+    };
+
+    async function fetchDictionaryInfo(word) {
+      const previewEl = document.getElementById("dictPreview");
+      const ipaInput = document.getElementById("qwIpa");
+      dictAudioUrl = null;
+      previewEl.textContent = `"${word}" 사전 데이터 조회 중...`;
+
+      try {
+        const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word.toLowerCase())}`);
+        if (!res.ok) throw new Error("Not found");
+        const data = await res.json();
+        const entry = data[0];
+        const phonetic = entry.phonetic || (entry.phonetics?.find(p => p.text)?.text) || "";
+        const audioObj = entry.phonetics?.find(p => p.audio && p.audio.length > 0);
+        if (audioObj) dictAudioUrl = audioObj.audio;
+        if (phonetic) ipaInput.value = phonetic;
+
+        const firstMeaning = entry.meanings?.[0];
+        const pos = firstMeaning?.partOfSpeech || "";
+        const def = firstMeaning?.definitions?.[0]?.definition || "";
+        previewEl.innerHTML = `<strong>${entry.word}</strong> ${phonetic ? `<span style="color:var(--primary);">${phonetic}</span>` : ""} ${pos ? `<em>(${pos})</em>` : ""}<br>${def}`;
+      } catch {
+        previewEl.textContent = `영영 사전 항목을 찾지 못했습니다. 한국어 뜻을 직접 입력해 저장하세요.`;
+      }
+    }
+
+    function openQuickWord(word, example, defaultCategoryKey) {
+      const box = document.getElementById("quickWordBox");
+      document.getElementById("qwExpr").value = word;
+      document.getElementById("qwMeaning").value = "";
+      document.getElementById("qwIpa").value = "";
+      document.getElementById("qwExample").value = example;
+      document.getElementById("qwCategory").value = defaultCategoryKey || "business";
+      box.classList.add("open");
+      document.getElementById("qwMeaning").focus();
+      fetchDictionaryInfo(word);
+    }
+
+    document.getElementById("closeQuickWordBtn").addEventListener("click", () => {
+      document.getElementById("quickWordBox").classList.remove("open");
+    });
+
+    document.getElementById("qwSpeakBtn").addEventListener("click", () => {
+      if (dictAudioUrl) {
+        new Audio(dictAudioUrl).play().catch(() => speakTTS(document.getElementById("qwExpr").value));
+      } else {
+        speakTTS(document.getElementById("qwExpr").value);
+      }
+    });
+
+    document.getElementById("qwSaveBtn").addEventListener("click", () => {
+      const expr = document.getElementById("qwExpr").value.trim();
+      const meaning = document.getElementById("qwMeaning").value.trim();
+      const categoryKey = document.getElementById("qwCategory").value;
+      const ipa = document.getElementById("qwIpa").value.trim();
+      const example = document.getElementById("qwExample").value.trim();
+      if (!expr || !meaning) {
+        showToast("표현과 한국어 뜻을 입력해주세요.");
+        return;
+      }
+      addNewCard(expr, meaning, example, ipa, categoryKey);
+      document.getElementById("quickWordBox").classList.remove("open");
+      showToast(`"${expr}" (${getCategoryLabel(categoryKey)}) 저장됨`);
+    });
+
+    // Add Custom Sentence
+    document.getElementById("toggleAddScriptBtn").addEventListener("click", () => {
+      document.getElementById("customScriptBox").classList.toggle("open");
+    });
+
+    document.getElementById("saveCustomSentenceBtn").addEventListener("click", () => {
+      const en = document.getElementById("newEnSentence").value.trim();
+      const ko = document.getElementById("newKoSentence").value.trim();
+      const startVal = parseFloat(document.getElementById("newStartSec").value);
+      const endVal = parseFloat(document.getElementById("newEndSec").value);
+
+      if (!en) {
+        showToast("영어 문장을 입력해주세요.");
+        return;
+      }
+      const script = getCurrentScript();
+      script.sentences.push({
+        keyExpr: "",
+        en,
+        ko: ko || "(해석 없음)",
+        start: Number.isFinite(startVal) ? startVal : null,
+        end: Number.isFinite(endVal) ? endVal : null
+      });
+      saveScripts(scripts);
+      document.getElementById("newEnSentence").value = "";
+      document.getElementById("newKoSentence").value = "";
+      document.getElementById("newStartSec").value = "";
+      document.getElementById("newEndSec").value = "";
+      document.getElementById("customScriptBox").classList.remove("open");
+      renderSentences();
+      showToast("문장이 현재 상황 스크립트에 추가되었습니다.");
+    });
+
+    // SM-2 SRS Engine
+    function calculateSM2(card, quality) {
+      let { interval, repetitions, easeFactor } = card;
+      if (quality === 1) {
+        repetitions = 0;
+        interval = 0;
+      } else {
+        if (repetitions === 0) interval = 1;
+        else if (repetitions === 1) interval = 3;
+        else interval = Math.round(interval * easeFactor);
+
+        if (quality === 2) interval = Math.max(1, Math.round(interval * 0.8));
+        if (quality === 4) interval = Math.round(interval * 1.3) + 1;
+        repetitions += 1;
+      }
+      easeFactor = Math.max(1.3, easeFactor + (0.1 - (4 - quality) * (0.08 + (4 - quality) * 0.02)));
+      return {
+        ...card,
+        interval,
+        repetitions,
+        easeFactor: Number(easeFactor.toFixed(2)),
+        dueDate: todayStr(interval)
+      };
+    }
+
+    document.getElementById("modeFlipBtn").addEventListener("click", () => {
+      srsMode = "flip";
+      document.getElementById("modeFlipBtn").classList.add("primary");
+      document.getElementById("modeClozeBtn").classList.remove("primary");
+      renderSRS();
+    });
+
+    document.getElementById("modeClozeBtn").addEventListener("click", () => {
+      srsMode = "cloze";
+      document.getElementById("modeClozeBtn").classList.add("primary");
+      document.getElementById("modeFlipBtn").classList.remove("primary");
+      renderSRS();
+    });
+
+    document.getElementById("practiceAllBtn").addEventListener("click", () => {
+      forceReviewAll = true;
+      renderSRS();
+    });
+
+    function buildClozeSentence(example, expression) {
+      if (!example) return `뜻: [ __________ ]`;
+      const escaped = expression.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const regex = new RegExp(escaped, "i");
+      if (regex.test(example)) {
+        return example.replace(regex, `<span style="color:var(--primary); font-weight:800;">[ ______ ]</span>`);
+      }
+      return `${example} <br><span style="color:var(--primary); font-weight:800;">[ ______ ]</span>`;
+    }
+
+    function renderSRS() {
+      const container = document.getElementById("srsContainer");
+      const today = todayStr();
+      const byCat = selectedSrsCategoryKey === "all"
+        ? cards
+        : cards.filter(c => c.categoryKey === selectedSrsCategoryKey);
+      const queue = forceReviewAll ? [...byCat] : byCat.filter(c => c.dueDate <= today);
+
+      if (queue.length === 0) {
+        forceReviewAll = false;
+        container.innerHTML = `
+          <div style="text-align:center; padding:36px 12px;">
+            <div style="font-size:1.12rem; font-weight:700; margin-bottom:6px;">선택한 카테고리의 오늘 복습 카드를 모두 완료했습니다!</div>
+            <p style="color:var(--muted); font-size:0.88rem;">상단 '전체 연습'을 누르면 예정일과 무관하게 다시 복습할 수 있습니다.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const current = queue[0];
+
+      if (srsMode === "cloze") {
+        const masked = buildClozeSentence(current.example, current.expression);
+        container.innerHTML = `
+          <div style="font-size:0.82rem; color:var(--muted); margin-bottom:10px;">남은 카드: <strong>${queue.length}</strong>개 · 빈칸 채우기 모드</div>
+          <div class="flashcard">
+            <div class="fc-cat">${getCategoryLabel(current.categoryKey)}</div>
+            <div style="font-size:0.95rem; font-weight:700; color:var(--accent); margin-bottom:8px;">뜻: ${current.meaning}</div>
+            <div class="fc-example">"${masked}"</div>
+            <div class="cloze-input-wrap">
+              <input type="text" id="clozeGuessInput" placeholder="빈칸에 들어갈 영어 표현 입력" autocomplete="off" />
+              <button class="primary sm" id="checkClozeBtn">확인</button>
+            </div>
+            <div id="clozeFeedback" style="font-size:0.85rem; margin-bottom:8px;"></div>
+            <div class="fc-answer" id="fcAnswerBox">
+              <div class="fc-word" style="font-size:1.35rem;">${current.expression}</div>
+              <div class="fc-ipa">${current.ipa || ""}</div>
+              <div class="srs-buttons">
+                <button class="srs-btn srs-again" onclick="gradeCard('${current.id}', 1)">Again<small>오늘 다시</small></button>
+                <button class="srs-btn srs-hard" onclick="gradeCard('${current.id}', 2)">Hard<small>짧게</small></button>
+                <button class="srs-btn srs-good" onclick="gradeCard('${current.id}', 3)">Good<small>표준 간격</small></button>
+                <button class="srs-btn srs-easy" onclick="gradeCard('${current.id}', 4)">Easy<small>길게</small></button>
+              </div>
+            </div>
+          </div>
+        `;
+
+        const checkFn = () => {
+          const guess = document.getElementById("clozeGuessInput").value.trim().toLowerCase();
+          const ans = current.expression.trim().toLowerCase();
+          const fb = document.getElementById("clozeFeedback");
+          if (guess === ans) {
+            fb.innerHTML = `<span style="color:var(--success); font-weight:700;">정답입니다!</span>`;
+          } else {
+            fb.innerHTML = `<span style="color:var(--danger); font-weight:700;">입력: "${guess || "(공백)"}"</span> → 정답을 확인하세요.`;
+          }
+          document.getElementById("fcAnswerBox").classList.add("visible");
+          speakTTS(current.expression);
+        };
+        document.getElementById("checkClozeBtn").addEventListener("click", checkFn);
+        document.getElementById("clozeGuessInput").addEventListener("keydown", e => {
+          if (e.key === "Enter") checkFn();
+        });
+      } else {
+        container.innerHTML = `
+          <div style="font-size:0.82rem; color:var(--muted); margin-bottom:10px;">남은 카드: <strong>${queue.length}</strong>개 · 플래시카드 모드</div>
+          <div class="flashcard">
+            <div class="fc-cat">${getCategoryLabel(current.categoryKey)}</div>
+            <div class="fc-word">${current.expression}</div>
+            <div class="fc-ipa">${current.ipa || ""}</div>
+            <div class="fc-example">"${current.example || ""}"</div>
+            <div style="display:flex; gap:8px;">
+              <button class="sm" onclick="speakCurrentCard()">🔊 발음 듣기</button>
+              <button class="sm primary" id="revealAnswerBtn">정답 및 뜻 확인</button>
+            </div>
+            <div class="fc-answer" id="fcAnswerBox">
+              <div class="fc-meaning">${current.meaning}</div>
+              <div style="font-size:0.78rem; color:var(--muted);">복습 간격: ${current.interval}일 · 난이도 계수: ${current.easeFactor}</div>
+              <div class="srs-buttons">
+                <button class="srs-btn srs-again" onclick="gradeCard('${current.id}', 1)">Again<small>오늘 다시</small></button>
+                <button class="srs-btn srs-hard" onclick="gradeCard('${current.id}', 2)">Hard<small>짧게</small></button>
+                <button class="srs-btn srs-good" onclick="gradeCard('${current.id}', 3)">Good<small>표준 간격</small></button>
+                <button class="srs-btn srs-easy" onclick="gradeCard('${current.id}', 4)">Easy<small>길게</small></button>
+              </div>
+            </div>
+          </div>
+        `;
+        document.getElementById("revealAnswerBtn").addEventListener("click", () => {
+          document.getElementById("fcAnswerBox").classList.add("visible");
+          document.getElementById("revealAnswerBtn").style.display = "none";
+        });
+      }
+
+      window.speakCurrentCard = () => speakTTS(`${current.expression}. ${current.example || ""}`);
+    }
+
+    window.gradeCard = function(id, quality) {
+      cards = cards.map(c => c.id === id ? calculateSM2(c, quality) : c);
+      saveCards(cards);
+      if (forceReviewAll) {
+        const idx = cards.findIndex(c => c.id === id);
+        const [moved] = cards.splice(idx, 1);
+        cards.push(moved);
+      }
+      renderCategoryChips("srsCategoryChips", selectedSrsCategoryKey, key => {
+        selectedSrsCategoryKey = key;
+        renderSRS();
+      });
+      renderSRS();
+    };
+
+    // Deck CRUD
+    function addNewCard(expression, meaning, example, ipa = "", categoryKey = "business") {
+      cards.unshift({
+        id: "c_" + Date.now(),
+        categoryKey,
+        expression,
+        meaning,
+        ipa,
+        example,
+        interval: 0,
+        repetitions: 0,
+        easeFactor: 2.5,
+        dueDate: todayStr()
+      });
+      saveCards(cards);
+      renderCategoryChips("deckCategoryChips", selectedDeckCategoryKey, key => {
+        selectedDeckCategoryKey = key;
+        renderDeck();
+      });
+      renderDeck();
+    }
+
+    document.getElementById("addCardBtn").addEventListener("click", () => {
+      const expr = document.getElementById("addExpr").value.trim();
+      const meaning = document.getElementById("addMeaning").value.trim();
+      const categoryKey = document.getElementById("addCategory").value;
+      const ipa = document.getElementById("addIpa").value.trim();
+      const example = document.getElementById("addExample").value.trim();
+      if (!expr || !meaning) {
+        showToast("표현과 뜻을 입력해주세요.");
+        return;
+      }
+      addNewCard(expr, meaning, example, ipa, categoryKey);
+      document.getElementById("addExpr").value = "";
+      document.getElementById("addMeaning").value = "";
+      document.getElementById("addIpa").value = "";
+      document.getElementById("addExample").value = "";
+      showToast("새 카드가 등록되었습니다.");
+    });
+
+    function renderDeck() {
+      const q = document.getElementById("deckSearchInput").value.trim().toLowerCase();
+      const filtered = cards.filter(c => {
+        const matchCat = selectedDeckCategoryKey === "all" || c.categoryKey === selectedDeckCategoryKey;
+        const matchQuery =
+          c.expression.toLowerCase().includes(q) ||
+          c.meaning.toLowerCase().includes(q) ||
+          (c.example || "").toLowerCase().includes(q);
+        return matchCat && matchQuery;
+      });
+      const today = todayStr();
+      const container = document.getElementById("deckList");
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<p style="color:var(--muted); font-size:0.9rem;">표시할 표현이 없습니다.</p>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(c => {
+        const isDue = c.dueDate <= today;
+        return `
+          <div class="deck-item">
+            <div>
+              <div style="font-weight:700; font-size:1rem;">
+                ${c.expression}
+                ${c.ipa ? `<span style="font-weight:400; color:var(--muted); font-size:0.84rem;">${c.ipa}</span>` : ""}
+                <span class="badge cat">${getCategoryLabel(c.categoryKey)}</span>
+                <span class="badge ${isDue ? "due" : ""}">${isDue ? "오늘 복습" : `다음: ${c.dueDate}`}</span>
+              </div>
+              <div style="font-size:0.9rem; color:#334155; margin-top:2px;">${c.meaning}</div>
+              ${c.example ? `<div style="font-size:0.82rem; color:var(--muted); margin-top:3px;">"${c.example}"</div>` : ""}
+            </div>
+            <div style="display:flex; gap:6px; flex-shrink:0;">
+              <button class="sm" onclick="speakTTS('${c.expression.replace(/'/g, "\\'")}')">🔊</button>
+              <button class="sm danger" onclick="deleteCard('${c.id}')">삭제</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    window.deleteCard = function(id) {
+      cards = cards.filter(c => c.id !== id);
+      saveCards(cards);
+      renderCategoryChips("deckCategoryChips", selectedDeckCategoryKey, key => {
+        selectedDeckCategoryKey = key;
+        renderDeck();
+      });
+      renderDeck();
+      showToast("삭제되었습니다.");
+    };
+
+    document.getElementById("deckSearchInput").addEventListener("input", renderDeck);
+
+    // JSON Export & Import
+    document.getElementById("exportJsonBtn").addEventListener("click", () => {
+      const payload = { version: 4, exportedAt: new Date().toISOString(), cards, scripts };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `echodeck-v4-backup-${todayStr()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById("importJsonInput").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const parsed = JSON.parse(ev.target.result);
+          if (Array.isArray(parsed.cards)) {
+            cards = parsed.cards;
+            saveCards(cards);
+          }
+          if (Array.isArray(parsed.scripts)) {
+            scripts = parsed.scripts;
+            saveScripts(scripts);
+            initScriptSelect();
+            syncYouTubePlayerForCurrentScript();
+            renderShadowingChips();
+            renderSentences();
+          }
+          renderCategoryChips("deckCategoryChips", selectedDeckCategoryKey, key => {
+            selectedDeckCategoryKey = key;
+            renderDeck();
+          });
+          renderDeck();
+          showToast("백업 데이터 복원이 완료되었습니다.");
+        } catch {
+          showToast("올바른 JSON 백업 파일이 아닙니다.");
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    // Init
+    populateCategorySelects();
+    initScriptSelect();
+    renderShadowingChips();
+    renderSentences();
+    renderCategoryChips("srsCategoryChips", selectedSrsCategoryKey, key => {
+      selectedSrsCategoryKey = key;
+      renderSRS();
+    });
+    renderCategoryChips("deckCategoryChips", selectedDeckCategoryKey, key => {
+      selectedDeckCategoryKey = key;
+      renderDeck();
+    });
+    renderDeck();
+    updateStats();
+  </script>
+</body>
+</html>
