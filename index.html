@@ -1306,11 +1306,29 @@
       if (!("speechSynthesis" in window)) return;
       voices = window.speechSynthesis.getVoices().filter(v => /^en[-_]/i.test(v.lang));
       const sel = $("voiceSelect");
-      if (!voices.length) { sel.innerHTML = `<option value="">기본</option>`; return; }
-      const cur = pickVoice();
-      sel.innerHTML = voices.map(v =>
-        `<option value="${esc(v.voiceURI)}" ${cur && v.voiceURI === cur.voiceURI ? "selected" : ""}>${esc(v.name.replace(/Microsoft |Google /, ""))} (${esc(v.lang.replace("_", "-"))})</option>`
+      if (!voices.length) { sel.innerHTML = `<option value="">자동</option>`; return; }
+      const saved = voices.find(v => v.voiceURI === state.settings.voice);
+      sel.innerHTML = `<option value="">자동</option>` + voices.map(v =>
+        `<option value="${esc(v.voiceURI)}" ${saved && v.voiceURI === saved.voiceURI ? "selected" : ""}>${esc(v.name.replace(/Microsoft |Google /, ""))} (${esc(v.lang.replace("_", "-"))})</option>`
       ).join("");
+    }
+
+    // iOS(및 iPadOS)는 음성 합성 동작이 달라 별도 처리
+    const IS_IOS = /iP(hone|ad|od)/.test(navigator.userAgent || "") ||
+      (/Mac/.test(navigator.platform || "") && navigator.maxTouchPoints > 1);
+    let currentUtter = null; // 참조를 유지하지 않으면 Safari가 이벤트를 누락함
+    let speakDelay = null;
+    let speakGuard = null;
+
+    function synthBusy() {
+      try { return window.speechSynthesis.speaking || window.speechSynthesis.pending; } catch (e) { return false; }
+    }
+    function cancelSpeech() {
+      clearTimeout(speakDelay);
+      clearTimeout(speakGuard);
+      if (!("speechSynthesis" in window)) return;
+      // Safari는 재생 중이 아닐 때 cancel()을 부르면 바로 다음 speak()가 무시될 수 있음
+      if (synthBusy()) { try { window.speechSynthesis.cancel(); } catch (e) {} }
     }
 
     function speak(text, cb) {
@@ -1319,15 +1337,29 @@
         return;
       }
       const tok = ++speakTok;
-      try { window.speechSynthesis.cancel(); } catch (e) {}
+      const wasBusy = synthBusy();
+      cancelSpeech();
       const u = new SpeechSynthesisUtterance(text);
       const v = pickVoice();
-      if (v) { u.voice = v; u.lang = v.lang.replace("_", "-"); } else { u.lang = "en-US"; }
+      const chosen = !!state.settings.voice && !!v && v.voiceURI === state.settings.voice;
+      // iOS에서는 직접 고른 음성이 아니면 시스템 기본 영어 음성을 사용(일부 음성은 소리 없이 실패)
+      if (v && (chosen || !IS_IOS)) { u.voice = v; u.lang = v.lang.replace("_", "-"); } else { u.lang = "en-US"; }
       u.rate = Number(state.settings.rate) || 1;
-      u.onend = u.onerror = () => {
+      const finish = () => {
+        clearTimeout(speakGuard);
         if (tok === speakTok && cb) { const f = cb; cb = null; f(); }
       };
-      window.speechSynthesis.speak(u);
+      u.onend = u.onerror = finish;
+      currentUtter = u;
+      const go = () => {
+        if (tok !== speakTok) return;
+        try { window.speechSynthesis.resume(); } catch (e) {}
+        window.speechSynthesis.speak(u);
+        // 종료 이벤트가 오지 않는 경우(Safari)에 대비한 안전 타이머
+        if (cb) speakGuard = setTimeout(finish, text.length * 110 / u.rate + 4000);
+      };
+      // 취소 직후 곧바로 speak()하면 Safari가 무시하므로 잠깐 띄움
+      if (wasBusy) speakDelay = setTimeout(go, 160); else go();
     }
 
     /* ================================================================
@@ -1484,7 +1516,7 @@
       playing = null;
       clearTimeout(gapTimer);
       clearInterval(ytTimer);
-      if ("speechSynthesis" in window) { try { window.speechSynthesis.cancel(); } catch (e) {} }
+      cancelSpeech();
       try { if (ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo(); } catch (e) {}
       updatePlayingUI(false);
     }
