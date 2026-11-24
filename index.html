@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>EchoDeck Pro — YouTube 싱크 쉐도잉 & SRS</title>
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --primary: #2563eb;
+      --primary-soft: #eff6ff;
+      --accent: #0f766e;
+      --danger: #dc2626;
+      --warn: #d97706;
+      --success: #16a34a;
+      --radius: 14px;
+      --shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      padding-bottom: 80px;
+    }
+
+    header {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 30;
+    }
+    .header-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 13px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand {
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .brand span {
+      background: linear-gradient(135deg, #2563eb, #0f766e);
+      color: #fff;
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+    .stats-pill {
+      font-size: 0.8rem;
+      color: var(--muted);
+      background: var(--bg);
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+    }
+    .stats-pill strong { color: var(--primary); }
+
+    nav.tabs {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      gap: 6px;
+      padding: 0 18px 10px;
+    }
+    .tab-btn {
+      flex: 1;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--muted);
+      padding: 9px 10px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.86rem;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .tab-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    main {
+      max-width: 900px;
+      margin: 18px auto;
+      padding: 0 18px;
+    }
+    .view { display: none; }
+    .view.active { display: block; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      padding: 8px 13px;
+      border-radius: 9px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    button:hover { background: #f8fafc; }
+    button.primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+    button.primary:hover { background: #1d4ed8; }
+    button.accent { background: var(--accent); color: #fff; border-color: var(--accent); }
+    button.danger { color: var(--danger); border-color: #fecaca; background: #fef2f2; }
+    button.sm { padding: 5px 10px; font-size: 0.78rem; }
+
+    select, input[type="text"], input[type="number"] {
+      font-family: inherit;
+      font-size: 0.88rem;
+      padding: 8px 11px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: #fff;
+      color: var(--text);
+    }
+
+    /* YouTube Player Wrapper */
+    .yt-box {
+      background: #0f172a;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 14px;
+      display: none;
+    }
+    .yt-box.visible { display: block; }
+    .yt-aspect {
+      position: relative;
+      width: 100%;
+      padding-top: 42%;
+    }
+    @media (max-width: 640px) {
+      .yt-aspect { padding-top: 56.25%; }
+    }
+    .yt-aspect iframe, #ytPlayerContainer {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .yt-bar {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 8px 12px;
+      font-size: 0.78rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .controls-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sentence-item {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 15px;
+      margin-bottom: 10px;
+      transition: 0.15s;
+    }
+    .sentence-item.playing {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+    }
+    .time-chip {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: #e2e8f0;
+      color: #334155;
+      padding: 1px 6px;
+      border-radius: 5px;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    .en-line {
+      font-size: 1.04rem;
+      font-weight: 600;
+      margin-bottom: 5px;
+      word-spacing: 2px;
+    }
+    .word-token {
+      cursor: pointer;
+      border-radius: 4px;
+      padding: 1px 2px;
+    }
+    .word-token:hover {
+      background: #dbeafe;
+      color: var(--primary);
+    }
+    .ko-line {
+      font-size: 0.87rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .sentence-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .stt-result {
+      margin-top: 8px;
+      font-size: 0.82rem;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: #f1f5f9;
+      color: #334155;
+      display: none;
+    }
+
+    .quick-box {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 14px;
+      display: none;
+    }
+    .quick-box.open { display: block; }
+    .dict-preview {
+      font-size: 0.82rem;
+      color: #334155;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 10px;
+      margin-top: 8px;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .form-grid-4 {
+      display: grid;
+      grid-template-columns: 2fr 2fr 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    @media (max-width: 640px) {
+      .form-grid, .form-grid-4 { grid-template-columns: 1fr; }
+    }
+
+    /* SRS Flashcard & Cloze */
+    .mode-switch {
+      display: flex;
+      gap: 6px;
+    }
+    .flashcard {
+      min-height: 250px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 26px 18px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    }
+    .fc-word {
+      font-size: 1.6rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .fc-ipa {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .fc-example {
+      font-size: 0.96rem;
+      color: #334155;
+      max-width: 560px;
+      margin-bottom: 14px;
+    }
+    .cloze-input-wrap {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      width: 100%;
+      max-width: 400px;
+    }
+    .cloze-input-wrap input { flex: 1; text-align: center; font-weight: 600; }
+    .fc-answer {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px dashed var(--border);
+      width: 100%;
+      max-width: 560px;
+      display: none;
+    }
+    .fc-answer.visible { display: block; }
+    .fc-meaning {
+      font-size: 1.12rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+    .srs-buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .srs-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px 6px;
+      font-size: 0.82rem;
+    }
+    .srs-btn small { font-weight: 400; color: var(--muted); font-size: 0.72rem; }
+    .srs-again { border-color: #fca5a5; color: var(--danger); }
+    .srs-hard { border-color: #fcd34d; color: var(--warn); }
+    .srs-good { border-color: #93c5fd; color: var(--primary); }
+    .srs-easy { border-color: #86efac; color: var(--success); }
+
+    /* Deck List */
+    .deck-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .deck-item:last-child { border-bottom: none; }
+    .badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-weight: 600;
+    }
+    .badge.due { background: #fef3c7; color: #b45309; }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e293b;
+      color: #fff;
+      padding: 9px 16px;
+      border-radius: 999px;
+      font-size: 0.84rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      z-index: 60;
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="brand">EchoDeck <span>PRO v2</span></div>
+      <div class="stats-pill">오늘 복습: <strong id="dueCountBadge">0</strong> · 전체 <strong id="totalCountBadge">0</strong></div>
+    </div>
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="shadowing">1. 미디어 쉐도잉</button>
+      <button class="tab-btn" data-tab="srs">2. SRS 복습</button>
+      <button class="tab-btn" data-tab="deck">3. 단어·표현장</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- TAB 1: SHADOWING -->
+    <section id="view-shadowing" class="view active">
+      <div class="card">
+        <div class="card-title">
+          <span>YouTube & TTS 구간 쉐도잉</span>
+          <span style="font-size:0.78rem; color:var(--muted); font-weight:500;">단어 클릭 → 자동 사전 조회 & 저장</span>
+        </div>
+
+        <div class="controls-bar">
+          <select id="scriptSelect"></select>
+          <label style="font-size:0.82rem; color:var(--muted);">속도
+            <select id="rateSelect">
+              <option value="0.75">0.75x</option>
+              <option value="0.9">0.9x</option>
+              <option value="1" selected>1.0x</option>
+              <option value="1.15">1.15x</option>
+            </select>
+          </label>
+          <button id="stopSpeechBtn" class="sm">⏹ 정지</button>
+          <button id="toggleYtSetupBtn" class="sm">🎬 YouTube 연결</button>
+          <button id="toggleAddScriptBtn" class="sm">+ 문장 추가</button>
+        </div>
+
+        <!-- YouTube URL Setup Drawer -->
+        <div id="ytSetupBox" class="quick-box">
+          <strong>현재 스크립트에 YouTube 영상 연결</strong>
+          <p style="font-size:0.8rem; color:var(--muted); margin-top:2px;">유튜브 링크 또는 11자리 영상 ID를 입력하면 문장별 시작/종료(초) 구간으로 원어민 음성을 재생합니다.</p>
+          <div class="form-grid" style="margin-top:8px;">
+            <input type="text" id="ytUrlInput" placeholder="예: https://youtu.be/dQw4w9WgXcQ 또는 영상 ID" />
+            <div style="display:flex; gap:6px;">
+              <button id="applyYtBtn" class="primary sm">영상 적용</button>
+              <button id="clearYtBtn" class="sm">연결 해제</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- YouTube Player -->
+        <div id="ytPlayerBox" class="yt-box">
+          <div class="yt-aspect">
+            <div id="ytPlayerContainer"></div>
+          </div>
+          <div class="yt-bar">
+            <span id="ytStatusText">YouTube 구간 싱크 대기 중</span>
+            <button id="captureTimeBtn" class="sm" style="background:#334155; color:#fff; border-color:#475569;">현재 재생초 확인</button>
+          </div>
+        </div>
+
+        <!-- Custom Sentence Add -->
+        <div id="customScriptBox" class="quick-box">
+          <strong>새 쉐도잉 문장 추가 (YouTube 구간 지정 선택 가능)</strong>
+          <div class="form-grid-4">
+            <input type="text" id="newEnSentence" placeholder="영어 문장" />
+            <input type="text" id="newKoSentence" placeholder="한국어 해석" />
+            <input type="number" id="newStartSec" step="0.1" placeholder="시작(초)" />
+            <input type="number" id="newEndSec" step="0.1" placeholder="종료(초)" />
+          </div>
+          <div style="margin-top:8px;">
+            <button id="saveCustomSentenceBtn" class="primary sm">문장 등록</button>
+          </div>
+        </div>
+
+        <!-- Dictionary Lookup & Quick Word Save -->
+        <div id="quickWordBox" class="quick-box">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong>사전 조회 & 단어장 담기</strong>
+            <button id="closeQuickWordBtn" class="sm">닫기</button>
+          </div>
+          <div id="dictPreview" class="dict-preview">단어를 불러오는 중...</div>
+          <div class="form-grid">
+            <input type="text" id="qwExpr" placeholder="단어 또는 숙어" />
+            <input type="text" id="qwMeaning" placeholder="한국어 뜻 입력 (예: ~을 해내다)" />
+            <input type="text" id="qwIpa" placeholder="발음기호 (자동 채움)" />
+            <input type="text" id="qwExample" placeholder="예문" />
+          </div>
+          <div style="margin-top:8px; display:flex; gap:8px;">
+            <button id="qwSaveBtn" class="primary sm">SRS 단어장에 저장</button>
+            <button id="qwSpeakBtn" class="sm">🔊 발음 듣기</button>
+          </div>
+        </div>
+
+        <div id="sentenceList"></div>
+      </div>
+    </section>
+
+    <!-- TAB 2: SRS REVIEW -->
+    <section id="view-srs" class="view">
+      <div class="card">
+        <div class="card-title">
+          <span>간격 반복(SRS) 복습 큐</span>
+          <div class="mode-switch">
+            <button id="modeFlipBtn" class="sm primary">플래시카드</button>
+            <button id="modeClozeBtn" class="sm">빈칸 타이핑</button>
+            <button id="practiceAllBtn" class="sm">전체 연습</button>
+          </div>
+        </div>
+        <div id="srsContainer"></div>
+      </div>
+    </section>
+
+    <!-- TAB 3: DECK MANAGEMENT -->
+    <section id="view-deck" class="view">
+      <div class="card">
+        <div class="card-title">
+          <span>새 표현 직접 추가</span>
+        </div>
+        <div class="form-grid">
+          <input type="text" id="addExpr" placeholder="영어 표현 (예: on the same page)" />
+          <input type="text" id="addMeaning" placeholder="한국어 뜻 (예: 같은 생각인, 의견이 일치하는)" />
+          <input type="text" id="addIpa" placeholder="발음기호 (선택)" />
+          <input type="text" id="addExample" placeholder="예문 (예: Let's make sure we're all on the same page.)" />
+        </div>
+        <div style="margin-top:10px;">
+          <button id="addCardBtn" class="primary">단어장에 추가</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span>내 단어·표현장</span>
+          <div style="display:flex; gap:6px;">
+            <button id="exportJsonBtn" class="sm">JSON 백업</button>
+            <label class="sm" style="border:1px solid var(--border); padding:5px 10px; border-radius:9px; font-size:0.78rem; font-weight:600; cursor:pointer; background:#fff;">
+              JSON 복원
+              <input type="file" id="importJsonInput" accept=".json" style="display:none;" />
+            </label>
+          </div>
+        </div>
+        <input type="text" id="deckSearchInput" placeholder="표현, 뜻, 예문 검색..." style="width:100%; margin-bottom:12px;" />
+        <div id="deckList"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <!-- YouTube IFrame Player API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script>
+    const STORAGE_KEY = "echodeck_cards_v2";
+    const LEGACY_KEY = "echodeck_cards_v1";
+    const SCRIPTS_KEY = "echodeck_scripts_v2";
+
+    const DEFAULT_SCRIPTS = [
+      {
+        id: "work_meeting",
+        title: "비즈니스 회의 & 협업 표현 (TTS)",
+        youtubeId: "",
+        sentences: [
+          { en: "Let's make sure we're all on the same page before moving forward.", ko: "다음 단계로 넘어가기 전에 우리 모두 의견이 일치하는지 확인합시다.", start: null, end: null },
+          { en: "I didn't think she could pull off the presentation on such short notice.", ko: "그렇게 촉박한 준비 기간에 그녀가 발표를 해낼 거라고는 생각하지 못했어요.", start: null, end: null },
+          { en: "Could you walk me through the updated schedule step by step?", ko: "업데이트된 일정을 단계별로 차근차근 설명해 주실 수 있나요?", start: null, end: null },
+          { en: "Let's circle back to that issue once we gather more data.", ko: "데이터를 좀 더 모은 뒤에 그 문제로 다시 돌아와서 이야기하죠.", start: null, end: null }
+        ]
+      },
+      {
+        id: "daily_nuance",
+        title: "일상 회화 핵심 구동사 (TTS)",
+        youtubeId: "",
+        sentences: [
+          { en: "Something urgent came up at work, so I have to take a rain check.", ko: "직장에 급한 일이 생겨서 다음으로 미뤄야 할 것 같아요.", start: null, end: null },
+          { en: "It took me a while to get the hang of using the new system.", ko: "새 시스템 사용 요령을 익히는 데 시간이 좀 걸렸어요.", start: null, end: null },
+          { en: "Don't beat yourself up over a minor mistake.", ko: "사소한 실수 때문에 너무 자책하지 마세요.", start: null, end: null }
+        ]
+      }
+    ];
+
+    const DEFAULT_CARDS = [
+      {
+        id: "c1",
+        expression: "on the same page",
+        meaning: "같은 생각인, 의견·이해가 일치하는",
+        ipa: "/ɒn ðə seɪm peɪdʒ/",
+        example: "Let's make sure we're all on the same page before moving forward.",
+        interval: 0,
+        repetitions: 0,
+        easeFactor: 2.5,
+        dueDate: todayStr()
+      },
+      {
+        id: "c2",
+        expression: "pull off",
+        meaning: "(어려운 일을) 해내다, 성공시키다",
+        ipa: "/pʊl ɒf/",
+        example: "I didn't think she could pull off the presentation on such short notice.",
+        interval: 0,
+        repetitions: 0,
+        easeFactor: 2.5,
+        dueDate: todayStr()
+      },
+      {
+        id: "c3",
+        expression: "take a rain check",
+        meaning: "다음 기회로 미루다",
+        ipa: "/teɪk ə reɪn tʃek/",
+        example: "Something urgent came up at work, so I have to take a rain check.",
+        interval: 1,
+        repetitions: 1,
+        easeFactor: 2.5,
+        dueDate: todayStr()
+      }
+    ];
+
+    function todayStr(offsetDays = 0) {
+      const d = new Date();
+      d.setDate(d.getDate() + offsetDays);
+      return d.toISOString().slice(0, 10);
+    }
+
+    function loadCards() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) return JSON.parse(raw);
+      const legacy = localStorage.getItem(LEGACY_KEY);
+      if (legacy) {
+        const migrated = JSON.parse(legacy).map(c => ({ ipa: "", ...c }));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+        return migrated;
+      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_CARDS));
+      return [...DEFAULT_CARDS];
+    }
+
+    function saveCards(list) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+      updateStats();
+    }
+
+    function loadScripts() {
+      const raw = localStorage.getItem(SCRIPTS_KEY);
+      if (!raw) {
+        localStorage.setItem(SCRIPTS_KEY, JSON.stringify(DEFAULT_SCRIPTS));
+        return JSON.parse(JSON.stringify(DEFAULT_SCRIPTS));
+      }
+      return JSON.parse(raw);
+    }
+
+    function saveScripts(list) {
+      localStorage.setItem(SCRIPTS_KEY, JSON.stringify(list));
+    }
+
+    let cards = loadCards();
+    let scripts = loadScripts();
+    let loopSentenceIdx = null;
+    let currentPlayingIdx = null;
+    let forceReviewAll = false;
+    let srsMode = "flip"; // "flip" | "cloze"
+    let dictAudioUrl = null;
+
+    // YouTube Player State
+    let ytPlayer = null;
+    let ytApiReady = false;
+    let ytMonitorTimer = null;
+
+    window.onYouTubeIframeAPIReady = function() {
+      ytApiReady = true;
+      syncYouTubePlayerForCurrentScript();
+    };
+
+    function extractYouTubeId(input) {
+      const trimmed = (input || "").trim();
+      if (!trimmed) return "";
+      if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return trimmed;
+      const m = trimmed.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([a-zA-Z0-9_-]{11})/);
+      return m ? m[1] : "";
+    }
+
+    function getCurrentScript() {
+      const id = document.getElementById("scriptSelect").value;
+      return scripts.find(s => s.id === id) || scripts[0];
+    }
+
+    function syncYouTubePlayerForCurrentScript() {
+      const script = getCurrentScript();
+      const box = document.getElementById("ytPlayerBox");
+      document.getElementById("ytUrlInput").value = script.youtubeId || "";
+
+      if (!script.youtubeId) {
+        box.classList.remove("visible");
+        stopAllPlayback(false);
+        return;
+      }
+
+      box.classList.add("visible");
+      if (!ytApiReady) return;
+
+      if (!ytPlayer) {
+        ytPlayer = new YT.Player("ytPlayerContainer", {
+          videoId: script.youtubeId,
+          playerVars: { playsinline: 1, rel: 0, modestbranding: 1 },
+          events: {
+            onReady: () => {
+              document.getElementById("ytStatusText").textContent = `연결됨: ${script.youtubeId}`;
+            }
+          }
+        });
+      } else if (ytPlayer.loadVideoById) {
+        ytPlayer.cueVideoById(script.youtubeId);
+        document.getElementById("ytStatusText").textContent = `연결됨: ${script.youtubeId}`;
+      }
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.classList.add("show");
+      clearTimeout(el._t);
+      el._t = setTimeout(() => el.classList.remove("show"), 2300);
+    }
+
+    function updateStats() {
+      const today = todayStr();
+      const dueCount = cards.filter(c => c.dueDate <= today).length;
+      document.getElementById("dueCountBadge").textContent = dueCount;
+      document.getElementById("totalCountBadge").textContent = cards.length;
+    }
+
+    // Tabs
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+        btn.classList.add("active");
+        const tab = btn.dataset.tab;
+        document.getElementById(`view-${tab}`).classList.add("active");
+        if (tab === "srs") renderSRS();
+        if (tab === "deck") renderDeck();
+      });
+    });
+
+    function stopAllPlayback(rerender = true) {
+      loopSentenceIdx = null;
+      currentPlayingIdx = null;
+      clearInterval(ytMonitorTimer);
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+      if (ytPlayer && ytPlayer.pauseVideo) {
+        try { ytPlayer.pauseVideo(); } catch {}
+      }
+      if (rerender) renderSentences();
+    }
+
+    document.getElementById("stopSpeechBtn").addEventListener("click", () => stopAllPlayback(true));
+
+    // TTS Fallback
+    function speakTTS(text, onEndCallback = null) {
+      if (!("speechSynthesis" in window)) {
+        showToast("이 브라우저는 음성 합성을 지원하지 않습니다.");
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "en-US";
+      utter.rate = parseFloat(document.getElementById("rateSelect").value || "1");
+      if (onEndCallback) utter.onend = onEndCallback;
+      window.speechSynthesis.speak(utter);
+    }
+
+    // Play Sentence (YouTube segment if configured, otherwise TTS)
+    function playSentenceSegment(idx, isLoop) {
+      const script = getCurrentScript();
+      const item = script.sentences[idx];
+      const rate = parseFloat(document.getElementById("rateSelect").value || "1");
+
+      clearInterval(ytMonitorTimer);
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+
+      currentPlayingIdx = idx;
+      renderSentences();
+
+      const hasYtSegment = script.youtubeId && ytPlayer && ytPlayer.seekTo && typeof item.start === "number" && typeof item.end === "number" && item.end > item.start;
+
+      if (hasYtSegment) {
+        ytPlayer.setPlaybackRate(rate);
+        ytPlayer.seekTo(item.start, true);
+        ytPlayer.playVideo();
+        document.getElementById("ytStatusText").textContent = `구간 재생: ${item.start}s ~ ${item.end}s`;
+
+        ytMonitorTimer = setInterval(() => {
+          if (!ytPlayer || !ytPlayer.getCurrentTime) return;
+          const now = ytPlayer.getCurrentTime();
+          if (now >= item.end) {
+            if (isLoop && loopSentenceIdx === idx) {
+              ytPlayer.seekTo(item.start, true);
+            } else {
+              clearInterval(ytMonitorTimer);
+              ytPlayer.pauseVideo();
+              currentPlayingIdx = null;
+              renderSentences();
+            }
+          }
+        }, 120);
+      } else {
+        const runTts = () => {
+          speakTTS(item.en, () => {
+            if (isLoop && loopSentenceIdx === idx) {
+              setTimeout(runTts, 600);
+            } else {
+              currentPlayingIdx = null;
+              renderSentences();
+            }
+          });
+        };
+        runTts();
+      }
+    }
+
+    window.playSingle = function(idx) {
+      loopSentenceIdx = null;
+      playSentenceSegment(idx, false);
+    };
+
+    window.toggleLoop = function(idx) {
+      if (loopSentenceIdx === idx) {
+        stopAllPlayback(true);
+        return;
+      }
+      loopSentenceIdx = idx;
+      playSentenceSegment(idx, true);
+    };
+
+    // YouTube Setup Handlers
+    document.getElementById("toggleYtSetupBtn").addEventListener("click", () => {
+      document.getElementById("ytSetupBox").classList.toggle("open");
+    });
+
+    document.getElementById("applyYtBtn").addEventListener("click", () => {
+      const vid = extractYouTubeId(document.getElementById("ytUrlInput").value);
+      if (!vid) {
+        showToast("유효한 YouTube URL 또는 11자리 영상 ID를 입력해주세요.");
+        return;
+      }
+      const script = getCurrentScript();
+      script.youtubeId = vid;
+      saveScripts(scripts);
+      syncYouTubePlayerForCurrentScript();
+      document.getElementById("ytSetupBox").classList.remove("open");
+      showToast("YouTube 영상이 연결되었습니다.");
+    });
+
+    document.getElementById("clearYtBtn").addEventListener("click", () => {
+      const script = getCurrentScript();
+      script.youtubeId = "";
+      saveScripts(scripts);
+      syncYouTubePlayerForCurrentScript();
+      showToast("YouTube 연결이 해제되었습니다.");
+    });
+
+    document.getElementById("captureTimeBtn").addEventListener("click", () => {
+      if (ytPlayer && ytPlayer.getCurrentTime) {
+        const sec = ytPlayer.getCurrentTime().toFixed(1);
+        showToast(`현재 재생 위치: ${sec}초`);
+      }
+    });
+
+    // Script Selector & Rendering
+    function initScriptSelect() {
+      const sel = document.getElementById("scriptSelect");
+      sel.innerHTML = scripts.map(s => `<option value="${s.id}">${s.title}</option>`).join("");
+      sel.addEventListener("change", () => {
+        stopAllPlayback(false);
+        syncYouTubePlayerForCurrentScript();
+        renderSentences();
+      });
+    }
+
+    function tokenizeSentence(sentence, sIdx) {
+      return sentence.split(" ").map(word => {
+        const clean = word.replace(/^[^a-zA-Z'-]+|[^a-zA-Z'-]+$/g, "");
+        return `<span class="word-token" data-word="${encodeURIComponent(clean)}" data-sidx="${sIdx}">${word}</span>`;
+      }).join(" ");
+    }
+
+    function renderSentences() {
+      const script = getCurrentScript();
+      const container = document.getElementById("sentenceList");
+
+      container.innerHTML = script.sentences.map((item, idx) => {
+        const isPlaying = currentPlayingIdx === idx;
+        const isLooping = loopSentenceIdx === idx;
+        const hasTiming = typeof item.start === "number" && typeof item.end === "number";
+        return `
+          <div class="sentence-item ${isPlaying ? "playing" : ""}">
+            <div class="en-line">
+              ${hasTiming ? `<span class="time-chip">${item.start}s–${item.end}s</span>` : ""}
+              ${tokenizeSentence(item.en, idx)}
+            </div>
+            <div class="ko-line">${item.ko}</div>
+            <div class="sentence-actions">
+              <button class="sm primary" onclick="playSingle(${idx})">▶ 듣기</button>
+              <button class="sm ${isLooping ? "accent" : ""}" onclick="toggleLoop(${idx})">${isLooping ? "🔁 반복 중" : "🔁 구간 반복"}</button>
+              <button class="sm" onclick="checkPronunciation(${idx})">🎙️ 따라 말하기</button>
+            </div>
+            <div class="stt-result" id="stt-${idx}"></div>
+          </div>
+        `;
+      }).join("");
+
+      container.querySelectorAll(".word-token").forEach(span => {
+        span.addEventListener("click", () => {
+          const word = decodeURIComponent(span.dataset.word);
+          const sIdx = parseInt(span.dataset.sidx, 10);
+          if (!word) return;
+          openQuickWord(word, script.sentences[sIdx].en);
+        });
+      });
+    }
+
+    // Speech Recognition (with iOS Safari graceful fallback)
+    window.checkPronunciation = function(idx) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const resultEl = document.getElementById(`stt-${idx}`);
+      if (!SpeechRecognition) {
+        showToast("현재 브라우저에서는 음성 인식이 제한됩니다. 쉐도잉 듣기 반복을 활용해주세요.");
+        return;
+      }
+      const target = getCurrentScript().sentences[idx].en;
+      const rec = new SpeechRecognition();
+      rec.lang = "en-US";
+      rec.interimResults = false;
+      resultEl.style.display = "block";
+      resultEl.textContent = "🎙️ 듣고 있습니다... 문장을 또박또박 읽어주세요.";
+
+      rec.onresult = (e) => {
+        const spoken = e.results[0][0].transcript;
+        resultEl.innerHTML = `<strong>인식 발화:</strong> "${spoken}"<br><span style="color:var(--muted);">원문 대조: "${target}"</span>`;
+      };
+      rec.onerror = () => {
+        resultEl.textContent = "음성을 인식하지 못했습니다. 마이크 권한을 확인해주세요.";
+      };
+      rec.start();
+    };
+
+    // Free Dictionary API Auto Lookup
+    async function fetchDictionaryInfo(word) {
+      const previewEl = document.getElementById("dictPreview");
+      const ipaInput = document.getElementById("qwIpa");
+      dictAudioUrl = null;
+      previewEl.textContent = `"${word}" 사전 데이터 조회 중...`;
+
+      try {
+        const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word.toLowerCase())}`);
+        if (!res.ok) throw new Error("Not found");
+        const data = await res.json();
+        const entry = data[0];
+        const phonetic = entry.phonetic || (entry.phonetics?.find(p => p.text)?.text) || "";
+        const audioObj = entry.phonetics?.find(p => p.audio && p.audio.length > 0);
+        if (audioObj) dictAudioUrl = audioObj.audio;
+        if (phonetic) ipaInput.value = phonetic;
+
+        const firstMeaning = entry.meanings?.[0];
+        const pos = firstMeaning?.partOfSpeech || "";
+        const def = firstMeaning?.definitions?.[0]?.definition || "";
+        previewEl.innerHTML = `<strong>${entry.word}</strong> ${phonetic ? `<span style="color:var(--primary);">${phonetic}</span>` : ""} ${pos ? `<em>(${pos})</em>` : ""}<br>${def}`;
+      } catch {
+        previewEl.textContent = `영영 사전 항목을 찾지 못했습니다. 한국어 뜻을 직접 입력해 저장하세요.`;
+      }
+    }
+
+    function openQuickWord(word, example) {
+      const box = document.getElementById("quickWordBox");
+      document.getElementById("qwExpr").value = word;
+      document.getElementById("qwMeaning").value = "";
+      document.getElementById("qwIpa").value = "";
+      document.getElementById("qwExample").value = example;
+      box.classList.add("open");
+      document.getElementById("qwMeaning").focus();
+      fetchDictionaryInfo(word);
+    }
+
+    document.getElementById("closeQuickWordBtn").addEventListener("click", () => {
+      document.getElementById("quickWordBox").classList.remove("open");
+    });
+
+    document.getElementById("qwSpeakBtn").addEventListener("click", () => {
+      if (dictAudioUrl) {
+        new Audio(dictAudioUrl).play().catch(() => speakTTS(document.getElementById("qwExpr").value));
+      } else {
+        speakTTS(document.getElementById("qwExpr").value);
+      }
+    });
+
+    document.getElementById("qwSaveBtn").addEventListener("click", () => {
+      const expr = document.getElementById("qwExpr").value.trim();
+      const meaning = document.getElementById("qwMeaning").value.trim();
+      const ipa = document.getElementById("qwIpa").value.trim();
+      const example = document.getElementById("qwExample").value.trim();
+      if (!expr || !meaning) {
+        showToast("표현과 한국어 뜻을 입력해주세요.");
+        return;
+      }
+      addNewCard(expr, meaning, example, ipa);
+      document.getElementById("quickWordBox").classList.remove("open");
+      showToast(`"${expr}" SRS 단어장에 저장됨`);
+    });
+
+    // Add Custom Sentence
+    document.getElementById("toggleAddScriptBtn").addEventListener("click", () => {
+      document.getElementById("customScriptBox").classList.toggle("open");
+    });
+
+    document.getElementById("saveCustomSentenceBtn").addEventListener("click", () => {
+      const en = document.getElementById("newEnSentence").value.trim();
+      const ko = document.getElementById("newKoSentence").value.trim();
+      const startVal = parseFloat(document.getElementById("newStartSec").value);
+      const endVal = parseFloat(document.getElementById("newEndSec").value);
+
+      if (!en) {
+        showToast("영어 문장을 입력해주세요.");
+        return;
+      }
+      const script = getCurrentScript();
+      script.sentences.push({
+        en,
+        ko: ko || "(해석 없음)",
+        start: Number.isFinite(startVal) ? startVal : null,
+        end: Number.isFinite(endVal) ? endVal : null
+      });
+      saveScripts(scripts);
+      document.getElementById("newEnSentence").value = "";
+      document.getElementById("newKoSentence").value = "";
+      document.getElementById("newStartSec").value = "";
+      document.getElementById("newEndSec").value = "";
+      document.getElementById("customScriptBox").classList.remove("open");
+      renderSentences();
+      showToast("문장이 현재 스크립트에 추가되었습니다.");
+    });
+
+    // SM-2 SRS Engine
+    function calculateSM2(card, quality) {
+      let { interval, repetitions, easeFactor } = card;
+      if (quality === 1) {
+        repetitions = 0;
+        interval = 0;
+      } else {
+        if (repetitions === 0) interval = 1;
+        else if (repetitions === 1) interval = 3;
+        else interval = Math.round(interval * easeFactor);
+
+        if (quality === 2) interval = Math.max(1, Math.round(interval * 0.8));
+        if (quality === 4) interval = Math.round(interval * 1.3) + 1;
+        repetitions += 1;
+      }
+      easeFactor = Math.max(1.3, easeFactor + (0.1 - (4 - quality) * (0.08 + (4 - quality) * 0.02)));
+      return {
+        ...card,
+        interval,
+        repetitions,
+        easeFactor: Number(easeFactor.toFixed(2)),
+        dueDate: todayStr(interval)
+      };
+    }
+
+    document.getElementById("modeFlipBtn").addEventListener("click", () => {
+      srsMode = "flip";
+      document.getElementById("modeFlipBtn").classList.add("primary");
+      document.getElementById("modeClozeBtn").classList.remove("primary");
+      renderSRS();
+    });
+
+    document.getElementById("modeClozeBtn").addEventListener("click", () => {
+      srsMode = "cloze";
+      document.getElementById("modeClozeBtn").classList.add("primary");
+      document.getElementById("modeFlipBtn").classList.remove("primary");
+      renderSRS();
+    });
+
+    document.getElementById("practiceAllBtn").addEventListener("click", () => {
+      forceReviewAll = true;
+      renderSRS();
+    });
+
+    function buildClozeSentence(example, expression) {
+      if (!example) return `뜻: [ __________ ]`;
+      const escaped = expression.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const regex = new RegExp(escaped, "i");
+      if (regex.test(example)) {
+        return example.replace(regex, `<span style="color:var(--primary); font-weight:800;">[ ______ ]</span>`);
+      }
+      return `${example} <br><span style="color:var(--primary); font-weight:800;">[ ______ ]</span>`;
+    }
+
+    function renderSRS() {
+      const container = document.getElementById("srsContainer");
+      const today = todayStr();
+      const queue = forceReviewAll ? [...cards] : cards.filter(c => c.dueDate <= today);
+
+      if (queue.length === 0) {
+        forceReviewAll = false;
+        container.innerHTML = `
+          <div style="text-align:center; padding:36px 12px;">
+            <div style="font-size:1.12rem; font-weight:700; margin-bottom:6px;">오늘 예정된 복습 카드를 모두 완료했습니다!</div>
+            <p style="color:var(--muted); font-size:0.88rem;">상단 '전체 연습'을 누르면 예정일과 무관하게 다시 복습할 수 있습니다.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const current = queue[0];
+
+      if (srsMode === "cloze") {
+        const masked = buildClozeSentence(current.example, current.expression);
+        container.innerHTML = `
+          <div style="font-size:0.82rem; color:var(--muted); margin-bottom:10px;">남은 카드: <strong>${queue.length}</strong>개 · 빈칸 채우기 모드</div>
+          <div class="flashcard">
+            <div style="font-size:0.95rem; font-weight:700; color:var(--accent); margin-bottom:8px;">뜻: ${current.meaning}</div>
+            <div class="fc-example">"${masked}"</div>
+            <div class="cloze-input-wrap">
+              <input type="text" id="clozeGuessInput" placeholder="빈칸에 들어갈 영어 표현 입력" autocomplete="off" />
+              <button class="primary sm" id="checkClozeBtn">확인</button>
+            </div>
+            <div id="clozeFeedback" style="font-size:0.85rem; margin-bottom:8px;"></div>
+            <div class="fc-answer" id="fcAnswerBox">
+              <div class="fc-word" style="font-size:1.35rem;">${current.expression}</div>
+              <div class="fc-ipa">${current.ipa || ""}</div>
+              <div class="srs-buttons">
+                <button class="srs-btn srs-again" onclick="gradeCard('${current.id}', 1)">Again<small>오늘 다시</small></button>
+                <button class="srs-btn srs-hard" onclick="gradeCard('${current.id}', 2)">Hard<small>짧게</small></button>
+                <button class="srs-btn srs-good" onclick="gradeCard('${current.id}', 3)">Good<small>표준 간격</small></button>
+                <button class="srs-btn srs-easy" onclick="gradeCard('${current.id}', 4)">Easy<small>길게</small></button>
+              </div>
+            </div>
+          </div>
+        `;
+
+        const checkFn = () => {
+          const guess = document.getElementById("clozeGuessInput").value.trim().toLowerCase();
+          const ans = current.expression.trim().toLowerCase();
+          const fb = document.getElementById("clozeFeedback");
+          if (guess === ans) {
+            fb.innerHTML = `<span style="color:var(--success); font-weight:700;">정답입니다!</span>`;
+          } else {
+            fb.innerHTML = `<span style="color:var(--danger); font-weight:700;">입력: "${guess || "(공백)"}"</span> → 정답을 확인하세요.`;
+          }
+          document.getElementById("fcAnswerBox").classList.add("visible");
+          speakTTS(current.expression);
+        };
+        document.getElementById("checkClozeBtn").addEventListener("click", checkFn);
+        document.getElementById("clozeGuessInput").addEventListener("keydown", e => {
+          if (e.key === "Enter") checkFn();
+        });
+      } else {
+        container.innerHTML = `
+          <div style="font-size:0.82rem; color:var(--muted); margin-bottom:10px;">남은 카드: <strong>${queue.length}</strong>개 · 플래시카드 모드</div>
+          <div class="flashcard">
+            <div class="fc-word">${current.expression}</div>
+            <div class="fc-ipa">${current.ipa || ""}</div>
+            <div class="fc-example">"${current.example || ""}"</div>
+            <div style="display:flex; gap:8px;">
+              <button class="sm" onclick="speakCurrentCard()">🔊 발음 듣기</button>
+              <button class="sm primary" id="revealAnswerBtn">정답 및 뜻 확인</button>
+            </div>
+            <div class="fc-answer" id="fcAnswerBox">
+              <div class="fc-meaning">${current.meaning}</div>
+              <div style="font-size:0.78rem; color:var(--muted);">복습 간격: ${current.interval}일 · 난이도 계수: ${current.easeFactor}</div>
+              <div class="srs-buttons">
+                <button class="srs-btn srs-again" onclick="gradeCard('${current.id}', 1)">Again<small>오늘 다시</small></button>
+                <button class="srs-btn srs-hard" onclick="gradeCard('${current.id}', 2)">Hard<small>짧게</small></button>
+                <button class="srs-btn srs-good" onclick="gradeCard('${current.id}', 3)">Good<small>표준 간격</small></button>
+                <button class="srs-btn srs-easy" onclick="gradeCard('${current.id}', 4)">Easy<small>길게</small></button>
+              </div>
+            </div>
+          </div>
+        `;
+        document.getElementById("revealAnswerBtn").addEventListener("click", () => {
+          document.getElementById("fcAnswerBox").classList.add("visible");
+          document.getElementById("revealAnswerBtn").style.display = "none";
+        });
+      }
+
+      window.speakCurrentCard = () => speakTTS(`${current.expression}. ${current.example || ""}`);
+    }
+
+    window.gradeCard = function(id, quality) {
+      cards = cards.map(c => c.id === id ? calculateSM2(c, quality) : c);
+      saveCards(cards);
+      if (forceReviewAll) {
+        const idx = cards.findIndex(c => c.id === id);
+        const [moved] = cards.splice(idx, 1);
+        cards.push(moved);
+      }
+      renderSRS();
+    };
+
+    // Deck CRUD
+    function addNewCard(expression, meaning, example, ipa = "") {
+      cards.unshift({
+        id: "c_" + Date.now(),
+        expression,
+        meaning,
+        ipa,
+        example,
+        interval: 0,
+        repetitions: 0,
+        easeFactor: 2.5,
+        dueDate: todayStr()
+      });
+      saveCards(cards);
+      renderDeck();
+    }
+
+    document.getElementById("addCardBtn").addEventListener("click", () => {
+      const expr = document.getElementById("addExpr").value.trim();
+      const meaning = document.getElementById("addMeaning").value.trim();
+      const ipa = document.getElementById("addIpa").value.trim();
+      const example = document.getElementById("addExample").value.trim();
+      if (!expr || !meaning) {
+        showToast("표현과 뜻을 입력해주세요.");
+        return;
+      }
+      addNewCard(expr, meaning, example, ipa);
+      document.getElementById("addExpr").value = "";
+      document.getElementById("addMeaning").value = "";
+      document.getElementById("addIpa").value = "";
+      document.getElementById("addExample").value = "";
+      showToast("새 카드가 등록되었습니다.");
+    });
+
+    function renderDeck() {
+      const q = document.getElementById("deckSearchInput").value.trim().toLowerCase();
+      const filtered = cards.filter(c =>
+        c.expression.toLowerCase().includes(q) ||
+        c.meaning.toLowerCase().includes(q) ||
+        (c.example || "").toLowerCase().includes(q)
+      );
+      const today = todayStr();
+      const container = document.getElementById("deckList");
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<p style="color:var(--muted); font-size:0.9rem;">표시할 표현이 없습니다.</p>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(c => {
+        const isDue = c.dueDate <= today;
+        return `
+          <div class="deck-item">
+            <div>
+              <div style="font-weight:700; font-size:1rem;">
+                ${c.expression}
+                ${c.ipa ? `<span style="font-weight:400; color:var(--muted); font-size:0.84rem;">${c.ipa}</span>` : ""}
+                <span class="badge ${isDue ? "due" : ""}">${isDue ? "오늘 복습" : `다음: ${c.dueDate}`}</span>
+              </div>
+              <div style="font-size:0.9rem; color:#334155; margin-top:2px;">${c.meaning}</div>
+              ${c.example ? `<div style="font-size:0.82rem; color:var(--muted); margin-top:3px;">"${c.example}"</div>` : ""}
+            </div>
+            <div style="display:flex; gap:6px; flex-shrink:0;">
+              <button class="sm" onclick="speakTTS('${c.expression.replace(/'/g, "\\'")}')">🔊</button>
+              <button class="sm danger" onclick="deleteCard('${c.id}')">삭제</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    window.deleteCard = function(id) {
+      cards = cards.filter(c => c.id !== id);
+      saveCards(cards);
+      renderDeck();
+      showToast("삭제되었습니다.");
+    };
+
+    document.getElementById("deckSearchInput").addEventListener("input", renderDeck);
+
+    // JSON Export & Import
+    document.getElementById("exportJsonBtn").addEventListener("click", () => {
+      const payload = { version: 2, exportedAt: new Date().toISOString(), cards, scripts };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `echodeck-v2-backup-${todayStr()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById("importJsonInput").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const parsed = JSON.parse(ev.target.result);
+          if (Array.isArray(parsed.cards)) {
+            cards = parsed.cards;
+            saveCards(cards);
+          }
+          if (Array.isArray(parsed.scripts)) {
+            scripts = parsed.scripts;
+            saveScripts(scripts);
+            initScriptSelect();
+            syncYouTubePlayerForCurrentScript();
+            renderSentences();
+          }
+          renderDeck();
+          showToast("백업 데이터 복원이 완료되었습니다.");
+        } catch {
+          showToast("올바른 JSON 백업 파일이 아닙니다.");
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    // Init
+    initScriptSelect();
+    renderSentences();
+    updateStats();
+  </script>
+</body>
+</html>
